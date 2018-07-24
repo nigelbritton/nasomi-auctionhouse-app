@@ -80,4 +80,13 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-.idea
+.idea/*
+
+# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+!.elasticbeanstalk/*.cfg.yml
+
+!.elasticbeanstalk/*.global.yml
+
