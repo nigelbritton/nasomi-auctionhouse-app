@@ -28,7 +28,10 @@ router.post('/searchItemByName', function(req, res, next) {
 });
 
 router.post('/searchItem', function(req, res, next) {
-    res.json({});
+    loadContent.searchItem( req.body.itemid, req.body.stack )
+        .then(function (response) {
+            res.send(response);
+        });
 });
 
 module.exports = router;
