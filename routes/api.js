@@ -24,7 +24,10 @@ router.post('/searchChar', function(req, res, next) {
 });
 
 router.post('/searchItemByName', function(req, res, next) {
-    res.json({});
+    loadContent.searchItemByName( req.body.itemname )
+        .then(function (response) {
+            res.send(response);
+        });
 });
 
 router.post('/searchItem', function(req, res, next) {

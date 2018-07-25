@@ -7,6 +7,8 @@ var searchWidget = {
         searchResultsId: 'searchResults',
         searchField: null,
         searchFieldId: 'searchField',
+        searchFieldType: null,
+        searchFieldTypeId: 'searchFieldType',
     },
     cachedData: {
         characters: {}
@@ -16,6 +18,8 @@ var searchWidget = {
         searchWidget.settings.searchFormSubmitButton = document.querySelector('#' + searchWidget.settings.searchFormId + ' button[type="submit"]');
         searchWidget.settings.searchResults = document.getElementById(searchWidget.settings.searchResultsId);
         searchWidget.settings.searchField = document.getElementById(searchWidget.settings.searchFieldId);
+        searchWidget.settings.searchFieldType = document.getElementById(searchWidget.settings.searchFieldTypeId);
+        // searchWidget.settings.searchFieldTypeOption = document.querySelector('#' + searchWidget.settings.searchFieldTypeId + ' input[type="checkbox"]');
 
         if (searchWidget.getLocalStorage('characters')) {
             searchWidget.cachedData.characters = searchWidget.getLocalStorage('characters');
@@ -26,18 +30,46 @@ var searchWidget = {
             searchWidget.disableSearchForm();
             searchWidget.settings.searchResults.innerHTML = '';
 
-            searchWidget.fetchQuery({
-                method: 'post',
-                url: '/api/searchCharByName',
-                data: { charname: searchWidget.settings.searchField.value }
-            }, function (resultsData) {
+            if (searchWidget.settings.searchFieldType.classList.contains('active')) {
+                searchWidget.fetchQuery({
+                    method: 'post',
+                    url: '/api/searchCharByName',
+                    data: { charname: searchWidget.settings.searchField.value }
+                }, function (resultsData) {
 
-                resultsData.forEach(function (resultData) {
-                    searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(resultData) );
+                    resultsData.forEach(function (result) {
+                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(result) );
+                    });
+                    searchWidget.enableSearchForm();
+
                 });
-                searchWidget.enableSearchForm();
+            } else {
+                searchWidget.fetchQuery({
+                    method: 'post',
+                    url: '/api/searchItemByName',
+                    data: { itemname: searchWidget.settings.searchField.value }
+                }, function (resultsData) {
 
-            });
+                    resultsData.list.forEach(function (result) {
+                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultItemList(result) );
+                    });
+                    searchWidget.enableSearchForm();
+
+                });
+            }
+
+        }, false);
+
+        searchWidget.settings.searchFieldType.addEventListener('click', function(event) {
+            searchWidget.disableSearchForm();
+            if (searchWidget.settings.searchFieldType.classList.contains('active')) {
+                searchWidget.settings.searchFieldType.classList.remove('active');
+                searchWidget.settings.searchField.placeholder = "Item name; i.e. Moat Carp";
+            } else {
+                searchWidget.settings.searchFieldType.classList.add('active');
+                searchWidget.settings.searchField.placeholder = "Character name; i.e. Shirukusan";
+            }
+            searchWidget.enableSearchForm();
         }, false);
 
         searchWidget.settings.searchResults.addEventListener('click', function(event) {
@@ -138,6 +170,7 @@ var searchWidget = {
     enableSearchForm: function () {
         searchWidget.settings.searchFormSubmitButton.disabled = false;
         searchWidget.settings.searchFormSubmitButton.classList.remove('disabled');
+        searchWidget.settings.searchField.value = '';
     },
 
     /**
@@ -172,6 +205,21 @@ var searchWidget = {
         return searchWidget.createElementFromHTML('<a href="#' + resultData.id + '" data-user-id="' + resultData.id + '" data-user-name="' + resultData.name + '" class="list-group-item list-group-item-action flex-column align-items-start">' +
             resultData.name +
             '</a>');
+    },
+
+    /**
+     *
+     * @param resultData object
+     * @returns {string}
+     */
+    buildResultItemList: function (resultData) {
+        return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
+            '<div class="d-flex w-100 justify-content-between">' +
+            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="0"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
+            (resultData.stackSize === '1' ? '' : '<small data-item-id="' + resultData.itemid + '" data-stack="1">Stack</small>') +
+            '</div>' +
+            '<p class="mb-1">' + resultData.item_desc + '</p>' +
+            '</div>');
     },
 
     /**
