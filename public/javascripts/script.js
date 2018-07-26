@@ -9,6 +9,8 @@ var searchWidget = {
         searchFieldId: 'searchField',
         searchFieldType: null,
         searchFieldTypeId: 'searchFieldType',
+        searchProgress: null,
+        searchProgressId: 'searchProgress',
     },
     cachedData: {
         characters: {}
@@ -19,6 +21,7 @@ var searchWidget = {
         searchWidget.settings.searchResults = document.getElementById(searchWidget.settings.searchResultsId);
         searchWidget.settings.searchField = document.getElementById(searchWidget.settings.searchFieldId);
         searchWidget.settings.searchFieldType = document.getElementById(searchWidget.settings.searchFieldTypeId);
+        searchWidget.settings.searchProgress = document.getElementById(searchWidget.settings.searchProgressId);
         // searchWidget.settings.searchFieldTypeOption = document.querySelector('#' + searchWidget.settings.searchFieldTypeId + ' input[type="checkbox"]');
 
         if (searchWidget.getLocalStorage('characters')) {
@@ -170,6 +173,7 @@ var searchWidget = {
     enableSearchForm: function () {
         searchWidget.settings.searchFormSubmitButton.disabled = false;
         searchWidget.settings.searchFormSubmitButton.classList.remove('disabled');
+        searchWidget.settings.searchProgress.classList.add('d-none');
         searchWidget.settings.searchField.value = '';
     },
 
@@ -179,6 +183,7 @@ var searchWidget = {
     disableSearchForm: function () {
         searchWidget.settings.searchFormSubmitButton.disabled = true;
         searchWidget.settings.searchFormSubmitButton.classList.add('disabled');
+        searchWidget.settings.searchProgress.classList.remove('d-none');
     },
 
     /**
