@@ -32,6 +32,7 @@ var searchWidget = {
             event.preventDefault();
             searchWidget.disableSearchForm();
             searchWidget.settings.searchResults.innerHTML = '';
+            searchWidget.settings.searchField.value.trim();
 
             if (searchWidget.settings.searchFieldType.classList.contains('active')) {
                 searchWidget.fetchQuery({
