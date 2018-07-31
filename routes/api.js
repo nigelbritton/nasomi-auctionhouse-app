@@ -37,4 +37,12 @@ router.post('/searchItem', function(req, res, next) {
         });
 });
 
+router.get('/getPopularCharacters', function(req, res, next) {
+    res.send(loadContent.getPopularCharacters());
+});
+
+router.get('/getPopularItems', function(req, res, next) {
+    res.send(loadContent.getPopularItems());
+});
+
 module.exports = router;
