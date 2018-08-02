@@ -11,9 +11,11 @@ var searchWidget = {
         searchFieldTypeId: 'searchFieldType',
         searchProgress: null,
         searchProgressId: 'searchProgress',
+        sectionButtons: null,
     },
     cachedData: {
-        characters: {}
+        characters: {},
+        recentItemSearches: []
     },
     init: function(options) {
         searchWidget.settings.searchForm = document.getElementById(searchWidget.settings.searchFormId);
@@ -24,8 +26,26 @@ var searchWidget = {
         searchWidget.settings.searchProgress = document.getElementById(searchWidget.settings.searchProgressId);
         // searchWidget.settings.searchFieldTypeOption = document.querySelector('#' + searchWidget.settings.searchFieldTypeId + ' input[type="checkbox"]');
 
+        searchWidget.settings.sectionButtons = document.querySelectorAll('footer .navbar .nav-link');
+        searchWidget.settings.sectionButtons.forEach(function ( sectionButton ) {
+            sectionButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                var targetSection = document.getElementById(this.dataset.id);
+                if (!targetSection.classList.contains('active')) {
+                    document.querySelectorAll('main section').forEach(function (sectionElement) {
+                        sectionElement.classList.remove('active');
+                    });
+                    targetSection.classList.add('active');
+                }
+            }, false);
+        });
+
         if (searchWidget.getLocalStorage('characters')) {
             searchWidget.cachedData.characters = searchWidget.getLocalStorage('characters');
+        }
+
+        if (searchWidget.getLocalStorage('recentItemSearches')) {
+            searchWidget.cachedData.recentItemSearches = searchWidget.getLocalStorage('recentItemSearches');
         }
 
         searchWidget.settings.searchForm.addEventListener('submit', function(event) {
@@ -99,6 +119,11 @@ var searchWidget = {
 
                 });
             } else if (event.target && event.target.dataset.hasOwnProperty('itemId') && event.target.dataset.hasOwnProperty('stack')) {
+                var itemObject = {
+                    itemId: event.target.dataset['itemId'],
+                    itemName: event.target.dataset['itemName']
+                };
+                searchWidget.updateRecentItemCache(itemObject);
                 searchWidget.settings.searchResults.innerHTML = '';
                 searchWidget.fetchQuery({
                     method: 'post',
@@ -168,6 +193,20 @@ var searchWidget = {
         this.setLocalStorage('characters', this.cachedData.characters);
     },
 
+    updateRecentItemCache: function (recentItemSearch) {
+        var itemFound = false;
+        this.cachedData.recentItemSearches.forEach(function (item) {
+            if (item.itemId === recentItemSearch.itemId) {
+                itemFound = true;
+            }
+        });
+        if (itemFound === false) { this.cachedData.recentItemSearches.unshift(recentItemSearch); }
+        while (this.cachedData.recentItemSearches.length > 20) {
+            this.cachedData.recentItemSearches.pop();
+        }
+        this.setLocalStorage('recentItemSearches', this.cachedData.recentItemSearches);
+    },
+
     /**
      *
      */
@@ -221,8 +260,8 @@ var searchWidget = {
     buildResultItemList: function (resultData) {
         return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
             '<div class="d-flex w-100 justify-content-between">' +
-            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="0"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
-            (resultData.stackSize === '1' ? '' : '<small data-item-id="' + resultData.itemid + '" data-stack="1">Stack</small>') +
+            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="0" data-item-name="' + resultData.item_name + '"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
+            (resultData.stackSize === '1' ? '' : '<small data-item-id="' + resultData.itemid + '" data-stack="1" data-item-name="' + resultData.item_name + '">Stack</small>') +
             '</div>' +
             '<p class="mb-1">' + resultData.item_desc + '</p>' +
             '</div>');
@@ -236,7 +275,7 @@ var searchWidget = {
     buildResultUserAuctionListings: function (resultData) {
         return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
             '<div class="d-flex w-100 justify-content-between">' +
-            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="' + resultData.stack + '"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
+            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="' + resultData.stack + '" data-item-name="' + resultData.item_name + '"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
             '<small>' + resultData.sell_date + '</small>' +
             '</div>' +
             '<p class="mb-1">' + resultData.item_desc + '</p>' +

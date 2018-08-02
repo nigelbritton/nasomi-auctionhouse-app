@@ -1,6 +1,6 @@
 {
   "name": "nasomi-auctionhouse-app",
-  "version": "0.0.1",
+  "version": "0.1.20180802",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",

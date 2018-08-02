@@ -1,3 +1,10 @@
+main {
+  color: inherit; }
+main section {
+  display: none; }
+main section.active {
+  display: block; }
+
 .container {
   max-width: 640px; }
 .list-group-item {
@@ -6,3 +13,12 @@
   font-size: 2.5rem;
   font-weight: 300;
   line-height: 1.2; }
+.nav-link {
+  color: #fff;
+  margin: 0 4px;
+  font-size: 2rem; }
+.nav-link:hover {
+  color: #999; }
+
+footer {
+  padding-bottom: 96px; }
