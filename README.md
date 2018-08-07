@@ -39,7 +39,7 @@ If you need some help getting started with AWS check out the support area below.
 
 ```
 eb init --platform node.js --region us-west-2
-eb create -s
+eb create --single --instance_type t2.nano
 ```
 
 Once the deployment has completed you can run the following command to view the deployed application.

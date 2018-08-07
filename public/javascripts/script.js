@@ -60,10 +60,15 @@ var searchWidget = {
                     url: '/api/searchCharByName',
                     data: { charname: searchWidget.settings.searchField.value }
                 }, function (resultsData) {
-
-                    resultsData.forEach(function (result) {
-                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(result) );
-                    });
+                    if (resultsData && resultsData.length > 0 && resultsData[0].buyer) {
+                        resultsData.forEach(function (resultData) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
+                        });
+                    } else {
+                        resultsData.forEach(function (result) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(result) );
+                        });
+                    }
                     searchWidget.enableSearchForm();
 
                 });

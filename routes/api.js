@@ -12,7 +12,15 @@ var loadContent = require('../lib/loadContent')();
 router.post('/searchCharByName', function(req, res, next) {
     loadContent.searchCharByName( req.body.charname )
         .then(function (response) {
-            res.send(response);
+            console.log(response.length);
+            if (response.length === 1) {
+                loadContent.searchChar( response[0].id )
+                    .then(function (response) {
+                        res.send(response);
+                    });
+            } else {
+                res.send(response);
+            }
         });
 });
 

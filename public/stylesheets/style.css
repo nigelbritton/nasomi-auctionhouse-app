@@ -23,9 +23,11 @@ footer .nav-link {
 footer .nav-link:hover {
   color: #999; }
 
+
 section#homepage article {
   background: #000000 url(../images/nasomi-auctionhouse-bg.png) no-repeat center / cover;
-  min-height: 100vh;
+  /*background: #000000 no-repeat center / cover;*/
+  min-height: 480px;
   max-width: 640px;
   margin: auto;
 }
@@ -47,6 +49,33 @@ section#homepage article .nav-link {
 section#homepage article .nav-link span {
   color: #ffffff;
   font-size: 1rem; }
+
+
+section#profile article {
+  background: #000000 no-repeat center / cover;
+  min-height: 100vh;
+  max-width: 640px;
+  margin: auto;
+}
+section#profile article .profile {
+  padding-top: 32px;
+  color: #fff;
+}
+section#profile article .profile--name {
+  text-align: center;
+  padding: 8px 0;
+  margin: 0;
+  display: block;
+}
+section#profile article .nav-link {
+  cursor: pointer;
+  color: #fff;
+  margin: 0 4px;
+  font-size: 2rem; }
+section#profile article .nav-link span {
+  color: #ffffff;
+  font-size: 1rem; }
+
 
 section#homepage h5 {
   text-transform: uppercase;
