@@ -29,7 +29,7 @@ var searchWidget = {
         searchWidget.settings.sectionButtons = document.querySelectorAll('footer .navbar .nav-link');
         searchWidget.settings.sectionButtons.forEach(function ( sectionButton ) {
             sectionButton.addEventListener('click', function(event) {
-                event.preventDefault();
+                // event.preventDefault();
                 var targetSection = document.getElementById(this.dataset.id);
                 if (!targetSection.classList.contains('active')) {
                     document.querySelectorAll('main section').forEach(function (sectionElement) {
