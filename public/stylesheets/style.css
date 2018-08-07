@@ -1,7 +1,7 @@
 main {
   color: inherit; }
 main section {
-  display: block; }
+  display: none; }
 main section.active {
   display: block; }
 

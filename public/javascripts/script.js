@@ -26,13 +26,67 @@ var searchWidget = {
         searchWidget.settings.searchProgress = document.getElementById(searchWidget.settings.searchProgressId);
         // searchWidget.settings.searchFieldTypeOption = document.querySelector('#' + searchWidget.settings.searchFieldTypeId + ' input[type="checkbox"]');
 
+        /*var a=document.getElementsByTagName("a");
+        for(var i=0;i<a.length;i++)
+        {
+            a[i].onclick=function()
+            {
+                window.location=this.getAttribute("href");
+                return false
+            }
+        }*/
+
         searchWidget.settings.sectionButtons = document.querySelectorAll('footer .navbar .nav-link');
-        searchWidget.settings.sectionButtons.forEach(function ( sectionButton ) {
+        for (var buttonIndex = 0; buttonIndex < searchWidget.settings.sectionButtons.length; buttonIndex++) {
+            searchWidget.settings.sectionButtons[buttonIndex].onclick = function(event) {
+                try {
+                    var sectionList = document.querySelectorAll('main section'),
+                        targetSection = document.getElementById(this.dataset.id);
+                    if (!targetSection.classList.contains('active')) {
+                        for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
+                            sectionList[sectionIndex].classList.remove('active');
+                        }
+                        targetSection.classList.add('active');
+                    }
+                } catch (e) {
+                    alert( e );
+                }
+                return false;
+            }
+        }
+
+        /*searchWidget.settings.sectionButtons.forEach(function ( sectionButton ) {
+            sectionButton.onclick = function(event) {
+                try {
+                    var sectionList = document.querySelectorAll('main section'),
+                        targetSection = document.getElementById(event.dataset.id);
+                    if (!targetSection.classList.contains('active')) {
+                        for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
+                            sectionList[sectionIndex].classList.remove('active');
+                        }
+                        targetSection.classList.add('active');
+                    }
+                } catch (e) {
+                    alert( e );
+                }
+                return false;
+            }
             sectionButton.addEventListener('click', function(event) {
                 event.preventDefault();
-                window.document.location.href = this.href;
+                try {
+                    var sectionList = document.querySelectorAll('main section'),
+                        targetSection = document.getElementById(event.dataset.id);
+                    if (!targetSection.classList.contains('active')) {
+                        for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
+                            sectionList[sectionIndex].classList.remove('active');
+                        }
+                        targetSection.classList.add('active');
+                    }
+                } catch (e) {
+                    alert( e );
+                }
             }, false);
-        });
+        });*/
 
         if (searchWidget.getLocalStorage('characters')) {
             searchWidget.cachedData.characters = searchWidget.getLocalStorage('characters');
@@ -301,7 +355,28 @@ var searchWidget = {
         div.innerHTML = htmlString.trim();
             // Change this to div.childNodes to support multiple top-level nodes
         return div.firstChild;
+    },
+
+
+    screenChange: function ( event ) {
+        try {
+            var sectionList = document.querySelectorAll('main section'),
+                targetSection = document.getElementById(event.dataset.id);
+            // alert(sectionList.length);
+            if (!targetSection.classList.contains('active')) {
+                for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
+                    sectionList[sectionIndex].classList.remove('active');
+                }
+                targetSection.classList.add('active');
+            }
+        } catch (e) {
+            alert( e );
+        }
+        return false;
     }
+
+
+
 };
 
 window.addEventListener('load', function(event) {
