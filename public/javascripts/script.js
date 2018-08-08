@@ -24,17 +24,6 @@ var searchWidget = {
         searchWidget.settings.searchField = document.getElementById(searchWidget.settings.searchFieldId);
         searchWidget.settings.searchFieldType = document.getElementById(searchWidget.settings.searchFieldTypeId);
         searchWidget.settings.searchProgress = document.getElementById(searchWidget.settings.searchProgressId);
-        // searchWidget.settings.searchFieldTypeOption = document.querySelector('#' + searchWidget.settings.searchFieldTypeId + ' input[type="checkbox"]');
-
-        /*var a=document.getElementsByTagName("a");
-        for(var i=0;i<a.length;i++)
-        {
-            a[i].onclick=function()
-            {
-                window.location=this.getAttribute("href");
-                return false
-            }
-        }*/
 
         searchWidget.settings.sectionButtons = document.querySelectorAll('footer .navbar .nav-link');
         for (var buttonIndex = 0; buttonIndex < searchWidget.settings.sectionButtons.length; buttonIndex++) {
@@ -54,39 +43,6 @@ var searchWidget = {
                 return false;
             }
         }
-
-        /*searchWidget.settings.sectionButtons.forEach(function ( sectionButton ) {
-            sectionButton.onclick = function(event) {
-                try {
-                    var sectionList = document.querySelectorAll('main section'),
-                        targetSection = document.getElementById(event.dataset.id);
-                    if (!targetSection.classList.contains('active')) {
-                        for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
-                            sectionList[sectionIndex].classList.remove('active');
-                        }
-                        targetSection.classList.add('active');
-                    }
-                } catch (e) {
-                    alert( e );
-                }
-                return false;
-            }
-            sectionButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                try {
-                    var sectionList = document.querySelectorAll('main section'),
-                        targetSection = document.getElementById(event.dataset.id);
-                    if (!targetSection.classList.contains('active')) {
-                        for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
-                            sectionList[sectionIndex].classList.remove('active');
-                        }
-                        targetSection.classList.add('active');
-                    }
-                } catch (e) {
-                    alert( e );
-                }
-            }, false);
-        });*/
 
         if (searchWidget.getLocalStorage('characters')) {
             searchWidget.cachedData.characters = searchWidget.getLocalStorage('characters');
@@ -240,9 +196,6 @@ var searchWidget = {
         if (!this.cachedData.characters[characterObject.userId]) {
             this.cachedData.characters[characterObject.userId] = characterObject;
         }
-        /*while (this.cachedData.characters.length > 5) {
-            this.cachedData.characters.pop();
-        }*/
         this.setLocalStorage('characters', this.cachedData.characters);
     },
 
@@ -331,7 +284,7 @@ var searchWidget = {
             '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="' + resultData.stack + '" data-item-name="' + resultData.item_name + '"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
             '<small>' + resultData.sell_date + '</small>' +
             '</div>' +
-            '<p class="mb-1">' + resultData.item_desc + '</p>' +
+            // '<p class="mb-1">' + resultData.item_desc + '</p>' +
             '<div class="d-flex w-100 justify-content-between"> ' +
             '<div> ' +
             '<small class="d-block" data-user-name="' + resultData.name + '">Seller: ' + resultData.name + '</small> ' +
@@ -342,6 +295,7 @@ var searchWidget = {
             '<small class="d-block">Stack: ' + (resultData.stack === '0' ? 'No' : 'Yes') + '</small> ' +
             '</div> ' +
             '</div> ' +
+            '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link" data-fav-item-id="' + resultData.itemid + '"><i class="fas fa-heart"></i></a></li><li class="nav-item"><a class="nav-link" data-item-id="' + resultData.itemid + '" data-stack="0"><i class="fas fa-search"></i></a></li><li class="nav-item"><a class="nav-link" data-item-id="' + resultData.itemid + '" data-stack="1"><i class="fas fa-search-plus"></i></a></li></ul>' +
             '</div>');
     },
 
@@ -374,8 +328,6 @@ var searchWidget = {
         }
         return false;
     }
-
-
 
 };
 

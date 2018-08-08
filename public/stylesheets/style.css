@@ -28,10 +28,10 @@ footer .nav-link:hover {
   color: #999; }
 
 
-section#homepage article {
+section#homepage article,
+section#search article {
   background: #000000 url(../images/nasomi-auctionhouse-bg.png) no-repeat center / cover;
-  /*background: #000000 no-repeat center / cover;*/
-  min-height: 480px;
+  min-height: 320px;
   max-width: 640px;
   margin: auto;
 }
@@ -85,3 +85,8 @@ section#homepage h5 {
   text-transform: uppercase;
   font-size: 14px;
 }
+
+
+.nav-options { margin-top: 12px; }
+.nav-options >.nav-item {  }
+.nav-options >.nav-item > .nav-link { color: #333333; }
