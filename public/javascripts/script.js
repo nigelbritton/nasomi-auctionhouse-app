@@ -266,10 +266,13 @@ var searchWidget = {
     buildResultItemList: function (resultData) {
         return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
             '<div class="d-flex w-100 justify-content-between">' +
-            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="0" data-item-name="' + resultData.item_name + '"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
-            (resultData.stackSize === '1' ? '' : '<small data-item-id="' + resultData.itemid + '" data-stack="1" data-item-name="' + resultData.item_name + '">Stack</small>') +
+            '<h5 class="mb-1"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
+            // (resultData.stackSize === '1' ? '' : '<small data-item-id="' + resultData.itemid + '" data-stack="1" data-item-name="' + resultData.item_name + '">Stack</small>') +
             '</div>' +
-            '<p class="mb-1">' + resultData.item_desc + '</p>' +
+            // '<p class="mb-1">' + resultData.item_desc + '</p>' +
+            '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="' + resultData.itemid + '"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="' + resultData.itemid + '" data-stack="0"></a></li>' +
+            (resultData.stackSize === '1' ? '' : '<li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="' + resultData.itemid + '" data-stack="1"></a></li>') +
+            '</ul>' +
             '</div>');
     },
 
@@ -281,7 +284,7 @@ var searchWidget = {
     buildResultUserAuctionListings: function (resultData) {
         return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
             '<div class="d-flex w-100 justify-content-between">' +
-            '<h5 class="mb-1" data-item-id="' + resultData.itemid + '" data-stack="' + resultData.stack + '" data-item-name="' + resultData.item_name + '"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
+            '<h5 class="mb-1"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
             '<small>' + resultData.sell_date + '</small>' +
             '</div>' +
             // '<p class="mb-1">' + resultData.item_desc + '</p>' +
@@ -295,7 +298,9 @@ var searchWidget = {
             '<small class="d-block">Stack: ' + (resultData.stack === '0' ? 'No' : 'Yes') + '</small> ' +
             '</div> ' +
             '</div> ' +
-            '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link" data-fav-item-id="' + resultData.itemid + '"><i class="fas fa-heart"></i></a></li><li class="nav-item"><a class="nav-link" data-item-id="' + resultData.itemid + '" data-stack="0"><i class="fas fa-search"></i></a></li><li class="nav-item"><a class="nav-link" data-item-id="' + resultData.itemid + '" data-stack="1"><i class="fas fa-search-plus"></i></a></li></ul>' +
+            '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="' + resultData.name + '"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="' + resultData.itemid + '"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="' + resultData.itemid + '" data-stack="0"></a></li>' +
+            (resultData.stackSize === '1' ? '' : '<li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="' + resultData.itemid + '" data-stack="1"></a></li>') +
+            '</ul>' +
             '</div>');
     },
 
