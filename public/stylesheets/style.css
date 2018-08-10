@@ -90,3 +90,4 @@ section#homepage h5 {
 .nav-options { margin-top: 12px; }
 .nav-options >.nav-item {  }
 .nav-options >.nav-item > .nav-link { color: #333333; }
+.nav-options >.nav-item > .nav-link.disabled { color: #999999; }

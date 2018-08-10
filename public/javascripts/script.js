@@ -299,7 +299,7 @@ var searchWidget = {
             '</div> ' +
             '</div> ' +
             '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="' + resultData.name + '"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="' + resultData.itemid + '"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="' + resultData.itemid + '" data-stack="0"></a></li>' +
-            (resultData.stackSize === '1' ? '' : '<li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="' + resultData.itemid + '" data-stack="1"></a></li>') +
+            (resultData.stackSize === '1' ? '<li class="nav-item"><a class="nav-link fas fa-search-plus disabled"></a></li>' : '<li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="' + resultData.itemid + '" data-stack="1"></a></li>') +
             '</ul>' +
             '</div>');
     },
