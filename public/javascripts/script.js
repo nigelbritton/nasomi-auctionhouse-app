@@ -64,7 +64,7 @@ var searchWidget = {
                     url: '/api/searchCharByName',
                     data: { charname: searchWidget.settings.searchField.value }
                 }, function (resultsData) {
-                    if (resultsData && resultsData.length > 0 && resultsData[0].buyer) {
+                    if (resultsData && resultsData.length > 0 && resultsData[0].itemid) {
                         resultsData.forEach(function (resultData) {
                             searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
                         });
@@ -156,9 +156,15 @@ var searchWidget = {
                     data: { charname: event.target.dataset['userName'] }
                 }, function (resultsData) {
 
-                    resultsData.forEach(function (resultData) {
-                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(resultData) );
-                    });
+                    if (resultsData.length > 0 && resultsData[0].itemid) {
+                        resultsData.forEach(function (resultData) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
+                        });
+                    } else {
+                        resultsData.forEach(function (resultData) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(resultData) );
+                        });
+                    }
                     searchWidget.enableSearchForm();
 
                 });
