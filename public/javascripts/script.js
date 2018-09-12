@@ -56,7 +56,7 @@ var searchWidget = {
             event.preventDefault();
             searchWidget.disableSearchForm();
             searchWidget.settings.searchResults.innerHTML = '';
-            searchWidget.settings.searchField.value.trim();
+            searchWidget.settings.searchField.value = searchWidget.settings.searchField.value.trim();
 
             if (searchWidget.settings.searchFieldType.classList.contains('active')) {
                 searchWidget.fetchQuery({
@@ -74,7 +74,6 @@ var searchWidget = {
                         });
                     }
                     searchWidget.enableSearchForm();
-
                 });
             } else {
                 searchWidget.fetchQuery({
@@ -82,12 +81,10 @@ var searchWidget = {
                     url: '/api/searchItemByName',
                     data: { itemname: searchWidget.settings.searchField.value }
                 }, function (resultsData) {
-
                     resultsData.list.forEach(function (result) {
                         searchWidget.settings.searchResults.appendChild( searchWidget.buildResultItemList(result) );
                     });
                     searchWidget.enableSearchForm();
-
                 });
             }
 
@@ -120,12 +117,10 @@ var searchWidget = {
                     url: '/api/searchChar',
                     data: { charid: event.target.dataset['userId'] }
                 }, function (resultsData) {
-
                     resultsData.forEach(function (resultData) {
                         searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
                     });
                     searchWidget.enableSearchForm();
-
                 });
             } else if (event.target && event.target.dataset.hasOwnProperty('itemId') && event.target.dataset.hasOwnProperty('stack')) {
                 var itemObject = {
@@ -141,12 +136,10 @@ var searchWidget = {
                         itemid: event.target.dataset['itemId'],
                         stack: event.target.dataset['stack']}
                 }, function (resultsData) {
-
                     resultsData.sale_list.forEach(function (resultData) {
                         searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
                     });
                     searchWidget.enableSearchForm();
-
                 });
             } else if (event.target && event.target.dataset.hasOwnProperty('userName')) {
                 searchWidget.settings.searchResults.innerHTML = '';
@@ -155,12 +148,10 @@ var searchWidget = {
                     url: '/api/searchCharByName',
                     data: { charname: event.target.dataset['userName'] }
                 }, function (resultsData) {
-
                     resultsData.forEach(function (resultData) {
                         searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(resultData) );
                     });
                     searchWidget.enableSearchForm();
-
                 });
             } else if (event.target && event.target.dataset) {
                 console.log(event.target.dataset);
@@ -243,7 +234,9 @@ var searchWidget = {
             dataType: "json",
             url: options.url,
             data: options.data,
-            success: function (data) { callback(data); }
+            success: function (data) { callback(data); },
+            error: function (xhr, status, error) { alert('Error!'); },
+            complete: function (xhr, status) { alert(status); }
         });
     },
 

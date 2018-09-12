@@ -5,7 +5,8 @@
 'use strict';
 
 var express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    debug = require('debug')('nasomi-auctionhouse-app:api');
 
 var loadContent = require('../lib/loadContent')();
 
@@ -20,6 +21,10 @@ router.post('/searchCharByName', function(req, res, next) {
             } else {
                 res.send(response);
             }
+        }, function (err) {
+            debug(err);
+            // res.statusCode = 500;
+            res.send([]);
         });
 });
 
@@ -41,6 +46,10 @@ router.post('/searchItem', function(req, res, next) {
     loadContent.searchItem( req.body.itemid, req.body.stack )
         .then(function (response) {
             res.send(response);
+        }, function (err) {
+            debug(err);
+            // res.statusCode = 500;
+            res.send([]);
         });
 });
 
