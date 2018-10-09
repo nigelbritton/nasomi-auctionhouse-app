@@ -43,6 +43,10 @@ router.post('/searchItem', function(req, res, next) {
     loadContent.searchItem( req.body.itemid, req.body.stack )
         .then(function (response) {
             res.send(response);
+        }).catch(function (error) {
+            debug(error);
+            res.statusCode(400);
+            res.send({});
         });
 });
 
