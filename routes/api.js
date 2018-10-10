@@ -13,6 +13,7 @@ var loadContent = require('../lib/loadContent')();
 router.post('/searchCharByName', function(req, res, next) {
     loadContent.searchCharByName( req.body.charname )
         .then(function (response) {
+            debug(response);
             if (response.length === 1) {
                 loadContent.searchChar( response[0].id )
                     .then(function (response) {
