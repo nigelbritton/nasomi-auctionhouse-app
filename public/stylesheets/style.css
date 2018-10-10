@@ -6,7 +6,7 @@ main section.active {
   display: block; }
 
 .container {
-  max-width: 640px; }
+  }
 .list-group-item {
   cursor: pointer; }
 .display-5 {
@@ -16,6 +16,16 @@ main section.active {
   padding: 16px;
   font-weight: 300;
   line-height: 1.2; }
+
+.breadcrumb {
+  background-color: transparent;
+}
+.card-title a {
+  color: inherit;
+}
+.card-img-right {
+  background: #333 url('https://cdn.shopify.com/s/files/1/2168/6841/products/20170926_170216_1024x1024@2x.jpg?v=1506555135') no-repeat center / cover;
+}
 
 footer {
   padding-bottom: 96px; }

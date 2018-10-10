@@ -2,8 +2,8 @@
 <html>
 <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name=apple-mobile-web-app-capable content=yes />
     <meta name=apple-mobile-web-app-status-bar-style content=black />
     <meta name="format-detection" content="telephone=no" />
@@ -16,10 +16,106 @@
     <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css'>
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script type="text/javascript" src="/javascripts/script.js"></script>
 </head>
 <body>
+
+<div class="container">
+    
+  <div class="row">
+    <div class="col-12"><img class="img-fluid" src="https://via.placeholder.com/1920x540" /></div>
+  </div>
+
+  <div class="row">
+    
+    <div class="col-12">
+      <div class="alert alert-danger alert-dismissible mt-3 mb-0 fade show" role="alert">
+        <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="col-12">
+      <nav class="navbar navbar-expand-md navbar-light bg-light mb-3 mt-3 justify-content-end">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/account/">Account</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/downloads/">Downloads</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/forums/">Forums</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/wiki/">Wiki</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/chat/">Chat</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/auction/">Auction House</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    
+  </div>
+
+</div>
+
 {{{body}}}
+
+<footer class="pt-4 border-top">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md">&copy; 2018</div>
+      <div class="col-md">
+        <h5>About</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="/about/team/">Team</a></li>
+          <li><a class="text-muted" href="/about/privacy/">Privacy</a></li>
+          <li><a class="text-muted" href="/about/terms/">Terms</a></li>
+        </ul>
+      </div>
+      <div class="col-md">
+        <h5>Resources</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="/downloads/">Downloads</a></li>
+          <li><a class="text-muted" href="/forums/">Forums</a></li>
+          <li><a class="text-muted" href="/wiki/">Wiki</a></li>
+          <li><a class="text-muted" href="/chat/">Chat</a></li>
+        </ul>
+      </div>
+      <div class="col-md">
+        <h5>Account</h5>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<footer class="d-none">
+    <nav class="navbar fixed-bottom navbar-dark bg-dark">
+        <ul class="nav justify-content-center m-auto">
+            <li class="nav-item"><a class="nav-link fas fa-home active" href="#" data-id="homepage"></a></li>
+            <li class="nav-item"><a class="nav-link fas fa-search" href="#" data-id="search"></a></li>
+            <li class="nav-item"><a class="nav-link fas fa-user-cog" href="#" data-id="profile"></a></li>
+        </ul>
+    </nav>
+</footer>
+
 </body>
 </html>
