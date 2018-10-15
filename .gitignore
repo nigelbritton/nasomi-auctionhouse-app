@@ -87,7 +87,7 @@ $RECYCLE.BIN/
 *.lnk
 
 .idea/*
-lib/*.dat
+lib/dat/*.dat
 
 # Elastic Beanstalk Files
 

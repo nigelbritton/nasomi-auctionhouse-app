@@ -360,3 +360,13 @@ window.addEventListener('load', function(event) {
     }, false);
 
 }, false);
+
+var FFXIProfile;
+(function (FFXIProfile, FFXI) {
+    if (!FFXI) { return false; }
+
+    var FFXIProfile = new FFXI.NasomiProfile().load();
+
+
+
+})(FFXIProfile || {}, FFXI);

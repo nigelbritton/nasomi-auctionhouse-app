@@ -20,7 +20,17 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 3600 }));
+
+app.use(function (req, res, next) {
+    res.removeHeader("x-powered-by");
+    res.setHeader('X-Frame-Options' , 'deny' );
+    res.setHeader('X-Content-Type-Options' , 'nosniff' );
+    res.setHeader('X-Permitted-Cross-Domain-Policies' , 'none' );
+    res.setHeader('X-XSS-Protection' , '1; mode=block' );
+    res.setHeader('Cache-Control', 'public, max-age=' + 3600);
+    next();
+});
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
