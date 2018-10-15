@@ -129,6 +129,51 @@ var FFXI;
     }());
     FFXI.NasomiAuctionConfig = NasomiAuctionConfig;
 
+    var NasomiInterface = (function () {
+        function NasomiInterface() {
+            var _this = this;
+            this.debug = false;
+            this.utils = new FFXI.NasomiUtils();
+        }
+
+        /**
+         * RenderAuctionItem
+         * @param result object
+         * @param asHTML boolean
+         * @returns {string | object}
+         * @constructor
+         */
+        NasomiInterface.prototype.RenderAuctionItem = function (result, asHTML) {
+            var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
+            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
+            var auctionItemHTML = auctionItemSold.replace('{{item_meta}}', auctionItemMeta);
+            return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
+        };
+        /**
+         *
+         * @param elementObject
+         * @param results
+         * @constructor
+         */
+        NasomiInterface.prototype.RenderAuctionResults = function (elementObject, results) {
+            var results = elementObject;
+            results.innerHTML = '';
+            for (var i = 0; i < results.length; i++) {
+                var auctionItemHTML = this.RenderAuctionItem();
+                results.append( this.utils.createElementFromHTML(auctionItemHTML) );
+            }
+
+        };
+        NasomiInterface.prototype.RenderUserItem = function () {
+
+        };
+        NasomiInterface.prototype.RenderUserResults = function () {
+            this.RenderUserItem();
+        };
+        return NasomiInterface;
+    }());
+    FFXI.NasomiInterface = NasomiInterface;
+
     var NasomiProfile = (function () {
         function NasomiProfile() {
             var _this = this;
@@ -155,6 +200,7 @@ var FFXI;
         NasomiProfile.prototype.load = function () {
             var NasomiUtils = new FFXI.NasomiUtils();
             var profile = NasomiUtils.getLocalStorage('ffxi-nasomi-profile');
+            if (typeof (profile) === "object") { this.profile = profile; }
             return (profile || this.profile);
         };
         /**
@@ -166,6 +212,37 @@ var FFXI;
             NasomiUtils.setLocalStorage('ffxi-nasomi-profile', this.profile);
         };
         /**
+         *
+         * @param profileName
+         */
+        NasomiProfile.prototype.find = function (profileName) {
+            return [];
+        };
+        /**
+         *
+         */
+        NasomiProfile.prototype.reset = function () {
+
+        };
+        /**
+         *
+         */
+        NasomiProfile.prototype.updateJob = function () {
+            return {};
+        };
+        /**
+         *
+         */
+        NasomiProfile.prototype.getAvatarList = function () {
+            return [];
+        };
+        /**
+         *
+         */
+        NasomiProfile.prototype.updateAvatar = function (avatarId) {
+            return {};
+        };
+        /**
          * savedAdd
          * @param saved
          * @returns {object}
@@ -174,7 +251,7 @@ var FFXI;
             var _this = this;
             var found = false;
             for(var i = 0; i < _this.profile.saved.length; i++) {
-                if (_this.profile.saved[i].id == saved.id) {
+                if (_this.profile.saved[i].id === saved.id) {
                     found = true;
                     break;
                 }
