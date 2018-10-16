@@ -143,10 +143,15 @@ var FFXI;
          * @returns {string | object}
          * @constructor
          */
-        NasomiInterface.prototype.RenderAuctionItem = function (result, asHTML) {
+        NasomiInterface.prototype.renderAuctionItem = function (result, asHTML) {
             var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
             var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
             var auctionItemHTML = auctionItemSold.replace('{{item_meta}}', auctionItemMeta);
+
+            Object.keys(result).forEach(function (key, index) {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), result[key]);
+            });
+
             return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
         };
         /**
@@ -155,20 +160,21 @@ var FFXI;
          * @param results
          * @constructor
          */
-        NasomiInterface.prototype.RenderAuctionResults = function (elementObject, results) {
+        NasomiInterface.prototype.renderAuctionResults = function (elementObject, results) {
             var results = elementObject;
             results.innerHTML = '';
             for (var i = 0; i < results.length; i++) {
-                var auctionItemHTML = this.RenderAuctionItem();
-                results.append( this.utils.createElementFromHTML(auctionItemHTML) );
+                results.append( this.utils.createElementFromHTML(this.renderAuctionItem({
+                    item_name: 'Item Name x12',
+                }, true)) );
             }
 
         };
-        NasomiInterface.prototype.RenderUserItem = function () {
+        NasomiInterface.prototype.renderUserItem = function () {
 
         };
-        NasomiInterface.prototype.RenderUserResults = function () {
-            this.RenderUserItem();
+        NasomiInterface.prototype.renderUserResults = function () {
+            this.renderUserItem();
         };
         return NasomiInterface;
     }());

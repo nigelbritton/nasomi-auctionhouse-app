@@ -57,6 +57,7 @@ var searchWidget = {
             searchWidget.disableSearchForm();
             searchWidget.settings.searchResults.innerHTML = '';
             searchWidget.settings.searchField.value.trim();
+            searchWidget.settings.searchField.blur();
 
             if (searchWidget.settings.searchFieldType.classList.contains('active')) {
                 searchWidget.fetchQuery({
@@ -107,12 +108,12 @@ var searchWidget = {
 
         searchWidget.settings.searchResults.addEventListener('click', function(event) {
             event.preventDefault();
-            searchWidget.disableSearchForm();
             if (event.target && event.target.dataset.hasOwnProperty('userId') && event.target.dataset.hasOwnProperty('userName')) {
                 var userObject = {
                     userId: event.target.dataset['userId'],
                     userName: event.target.dataset['userName']
                 };
+                searchWidget.disableSearchForm();
                 searchWidget.updateCharacterCache(userObject);
                 searchWidget.settings.searchResults.innerHTML = '';
                 searchWidget.fetchQuery({
@@ -132,6 +133,7 @@ var searchWidget = {
                     itemId: event.target.dataset['itemId'],
                     itemName: event.target.dataset['itemName']
                 };
+                searchWidget.disableSearchForm();
                 searchWidget.updateRecentItemCache(itemObject);
                 searchWidget.settings.searchResults.innerHTML = '';
                 searchWidget.fetchQuery({
@@ -149,6 +151,7 @@ var searchWidget = {
 
                 });
             } else if (event.target && event.target.dataset.hasOwnProperty('userName')) {
+                searchWidget.disableSearchForm();
                 searchWidget.settings.searchResults.innerHTML = '';
                 searchWidget.fetchQuery({
                     method: 'post',
