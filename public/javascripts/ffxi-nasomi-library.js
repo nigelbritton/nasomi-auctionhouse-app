@@ -93,16 +93,31 @@ var FFXI;
         /**
          *
          * @param params
+         * @param callback
          */
-        NasomiAuction.prototype.search = function (params) {
-            // NasomiAuction.searchRequest()
+        NasomiAuction.prototype.search = function (params, callback) {
+            var options = {
+                method: 'post',
+            };
+            if (params.hasOwnProperty('charname')) {
+                options.url = '/api/searchCharByName';
+                options.charname = params.charname.trim();
+            }
+            if (params.hasOwnProperty('charid')) {
+                options.url = '/api/searchChar';
+                options.charid = params.charid;
+            }
+            NasomiAuction.searchRequest(options, this.renderResults(status, response));
         };
         /**
          *
-         * @param params
+         * @param status
+         * @param results
          */
-        NasomiAuction.prototype.renderResults = function (params) {
-
+        NasomiAuction.prototype.renderResults = function (status, results) {
+            var nasomiInterface = new FFXI.NasomiInterface(),
+                searchResultsElement = document.getElementById('results');
+            nasomiInterface.renderAuctionResults(searchResultsElement, results);
         };
         /**
          *
@@ -114,7 +129,7 @@ var FFXI;
                 method: options.method,
                 url: options.url,
                 params: options.params
-            }, callback(status, response));
+            }, callback);
         };
         return NasomiAuction;
     }());
@@ -154,6 +169,7 @@ var FFXI;
 
             return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
         };
+
         /**
          *
          * @param elementObject
@@ -161,21 +177,43 @@ var FFXI;
          * @constructor
          */
         NasomiInterface.prototype.renderAuctionResults = function (elementObject, results) {
-            var results = elementObject;
-            results.innerHTML = '';
-            for (var i = 0; i < results.length; i++) {
-                results.append( this.utils.createElementFromHTML(this.renderAuctionItem({
-                    item_name: 'Item Name x12',
-                }, true)) );
+            if (!elementObject) { return; }
+            elementObject.innerHTML = '';
+            for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
+                elementObject.append( this.renderAuctionItem(results[resultIndex], true));
             }
+        };
 
-        };
-        NasomiInterface.prototype.renderUserItem = function () {
+        /**
+         *
+         * @param result
+         * @param asHTML
+         * @returns {*}
+         */
+        NasomiInterface.prototype.renderUserItem = function (result, asHTML) {
+            var userItem = '<div data-user-id="{{id}}" data-user-name="{{name}}" class="list-group-item list-group-item-action flex-column align-items-start">{{name}}</div>';
+            var userItemHTML = userItem + '';
 
+            Object.keys(result).forEach(function (key, index) {
+                userItemHTML = userItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), result[key]);
+            });
+
+            return (asHTML === true ? this.utils.createElementFromHTML(userItemHTML) : userItemHTML);
         };
-        NasomiInterface.prototype.renderUserResults = function () {
-            this.renderUserItem();
+
+        /**
+         *
+         * @param elementObject
+         * @param results
+         */
+        NasomiInterface.prototype.renderUserResults = function (elementObject, results) {
+            if (!elementObject) { return; }
+            elementObject.innerHTML = '';
+            for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
+                elementObject.append( this.renderUserItem(results[resultIndex], true));
+            }
         };
+
         return NasomiInterface;
     }());
     FFXI.NasomiInterface = NasomiInterface;
