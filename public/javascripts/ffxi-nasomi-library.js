@@ -95,26 +95,26 @@ var FFXI;
          * @param params
          * @param callback
          */
-        NasomiAuction.prototype.search = function (params, callback) {
+        NasomiAuction.search = function (params) {
             var options = {
                 method: 'post',
             };
             if (params.hasOwnProperty('charname')) {
                 options.url = '/api/searchCharByName';
-                options.charname = params.charname.trim();
+                options.params = { charname: params.charname.trim() };
             }
             if (params.hasOwnProperty('charid')) {
                 options.url = '/api/searchChar';
-                options.charid = params.charid;
+                options.params = { charid: params.charid };
             }
-            NasomiAuction.searchRequest(options, this.renderResults(status, response));
+            NasomiAuction.searchRequest(options, NasomiAuction.renderResults);
         };
         /**
          *
          * @param status
          * @param results
          */
-        NasomiAuction.prototype.renderResults = function (status, results) {
+        NasomiAuction.renderResults = function (status, results) {
             var nasomiInterface = new FFXI.NasomiInterface(),
                 searchResultsElement = document.getElementById('results');
             nasomiInterface.renderAuctionResults(searchResultsElement, results);
@@ -180,7 +180,7 @@ var FFXI;
             if (!elementObject) { return; }
             elementObject.innerHTML = '';
             for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
-                elementObject.append( this.renderAuctionItem(results[resultIndex], true));
+                // elementObject.append( this.renderAuctionItem(results[resultIndex], true));
             }
         };
 
