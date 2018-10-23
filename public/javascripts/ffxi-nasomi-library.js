@@ -44,15 +44,26 @@ var FFXI;
          * @param callback
          */
         NasomiUtils.fetchQuery = function (options, callback) {
+            var responseJSON = {};
             var xhr = new XMLHttpRequest();
             xhr.open(options.method, options.url);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    callback(xhr.status, xhr.responseText);
+                    try {
+                        responseJSON = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        responseJSON = {};
+                    }
+                    callback(xhr.status, responseJSON);
                 }
                 else if (xhr.status !== 200) {
-                    callback(xhr.status, xhr.responseText);
+                    try {
+                        responseJSON = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        responseJSON = {};
+                    }
+                    callback(xhr.status, responseJSON);
                 }
             };
             xhr.send(this.fetchParams(options.params));
@@ -105,15 +116,15 @@ var FFXI;
             }
             if (params.hasOwnProperty('charid')) {
                 options.url = '/api/searchChar';
-                options.params = { charid: params.charid };
+                options.params = { charid: Math.floor(params.charid) };
             }
             if (params.hasOwnProperty('itemname')) {
                 options.url = '/api/searchItemByName';
-                options.params = { itemname: params.itemname };
+                options.params = { itemname: params.itemname.trim() };
             }
             if (params.hasOwnProperty('itemid')) {
                 options.url = '/api/searchItem';
-                options.params = { itemid: params.itemid, stack: (params.stack || 0) };
+                options.params = { itemid: Math.floor(params.itemid), stack: (params.stack || 0) };
             }
             NasomiAuction.searchRequest(options, NasomiAuction.renderResults);
         };
@@ -130,7 +141,9 @@ var FFXI;
             if (results.hasOwnProperty('sales')) {
                 nasomiInterface.renderAuctionResultsHeader(searchResultsElement, results);
             }
-            nasomiInterface.renderAuctionResults(searchResultsElement, results);
+            if (results.hasOwnProperty('sale_list')) {
+                nasomiInterface.renderAuctionResults(searchResultsElement, results['sale_list']);
+            }
         };
         /**
          *
@@ -179,6 +192,8 @@ var FFXI;
             Object.keys(result).forEach(function (key, index) {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), result[key]);
             });
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stack_label}}', 'g'), (result.stack === '0' ? 'No' : 'Yes'));
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
 
             return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
         };
@@ -188,10 +203,39 @@ var FFXI;
             elementObject.innerHTML = '';
         };
 
+        NasomiInterface.prototype.renderAuctionHeader = function (results, asHTML) {
+            var auctionHeader = '<div class="list-group-item list-group-item-action flex-column align-items-start mb-3"><div class="d-flex w-100 justify-content-between"><div><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5></div><div><small class="d-block">Stock: {{stock}}</small><small class="d-block">Sell Frequency: {{stock_frequency}}</small></div></div></div>';
+            var auctionItemHTML = '' + auctionHeader;
+            var auctionStockFrequency = 'Slow'; // Slow, Normal, Fast
+
+            if (results['sales'] && results['sales']['sold15days']) {
+                if (Math.floor(results['sales']['sold15days']) > 500 &&
+                    Math.floor(results['sales']['sold15days']) <= 1000) {
+                    auctionStockFrequency = 'Normal';
+                } else if (Math.floor(results['sales']['sold15days']) > 1000) {
+                    auctionStockFrequency = 'Fast';
+                }
+            }
+
+            if (results.sale_list.length > 0) {
+                Object.keys(results.sale_list[0]).forEach(function (key, index) {
+                    auctionItemHTML = auctionItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), results.sale_list[0][key]);
+                });
+            }
+
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock}}', 'g'), results['sales']['onStock']);
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock_frequency}}', 'g'), auctionStockFrequency);
+
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+
+            return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
+        };
+
         NasomiInterface.prototype.renderAuctionResultsHeader = function (elementObject, results) {
+
             if (!elementObject) { return; }
             if (results.hasOwnProperty('sales')) {
-                // elementObject.append( this.renderAuctionHeader(results, true));
+                elementObject.append( this.renderAuctionHeader(results, true));
             }
         };
 
@@ -203,8 +247,11 @@ var FFXI;
          */
         NasomiInterface.prototype.renderAuctionResults = function (elementObject, results) {
             if (!elementObject) { return; }
+            if (results.hasOwnProperty('sales')) {
+                elementObject.append( this.renderAuctionHeader(results, true));
+            }
             for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
-                // elementObject.append( this.renderAuctionItem(results[resultIndex], true));
+                elementObject.append( this.renderAuctionItem(results[resultIndex], true));
             }
         };
 

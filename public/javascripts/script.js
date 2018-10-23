@@ -60,7 +60,8 @@ var searchWidget = {
             searchWidget.settings.searchField.blur();
 
             if (searchWidget.settings.searchFieldType.classList.contains('active')) {
-                searchWidget.fetchQuery({
+                FFXI.NasomiAuction.search({charname:searchWidget.settings.searchField.value});
+                /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchCharByName',
                     data: { charname: searchWidget.settings.searchField.value }
@@ -76,9 +77,10 @@ var searchWidget = {
                     }
                     searchWidget.enableSearchForm();
 
-                });
+                });*/
             } else {
-                searchWidget.fetchQuery({
+                FFXI.NasomiAuction.search({itemname:searchWidget.settings.searchField.value});
+                /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchItemByName',
                     data: { itemname: searchWidget.settings.searchField.value }
@@ -89,7 +91,7 @@ var searchWidget = {
                     });
                     searchWidget.enableSearchForm();
 
-                });
+                });*/
             }
 
         }, false);
@@ -113,10 +115,11 @@ var searchWidget = {
                     userId: event.target.dataset['userId'],
                     userName: event.target.dataset['userName']
                 };
-                searchWidget.disableSearchForm();
+                // searchWidget.disableSearchForm();
                 searchWidget.updateCharacterCache(userObject);
                 searchWidget.settings.searchResults.innerHTML = '';
-                searchWidget.fetchQuery({
+                FFXI.NasomiAuction.search({charid:event.target.dataset['userId']});
+                /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchChar',
                     data: { charid: event.target.dataset['userId'] }
@@ -127,16 +130,17 @@ var searchWidget = {
                     });
                     searchWidget.enableSearchForm();
 
-                });
+                });*/
             } else if (event.target && event.target.dataset.hasOwnProperty('itemId') && event.target.dataset.hasOwnProperty('stack')) {
                 var itemObject = {
                     itemId: event.target.dataset['itemId'],
                     itemName: event.target.dataset['itemName']
                 };
-                searchWidget.disableSearchForm();
+                // searchWidget.disableSearchForm();
                 searchWidget.updateRecentItemCache(itemObject);
                 searchWidget.settings.searchResults.innerHTML = '';
-                searchWidget.fetchQuery({
+                FFXI.NasomiAuction.search({itemid:event.target.dataset['itemId'],stack:event.target.dataset['stack']});
+                /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchItem',
                     data: {
@@ -149,11 +153,12 @@ var searchWidget = {
                     });
                     searchWidget.enableSearchForm();
 
-                });
+                });*/
             } else if (event.target && event.target.dataset.hasOwnProperty('userName')) {
-                searchWidget.disableSearchForm();
+                // searchWidget.disableSearchForm();
                 searchWidget.settings.searchResults.innerHTML = '';
-                searchWidget.fetchQuery({
+                FFXI.NasomiAuction.search({charname:event.target.dataset['userName']});
+                /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchCharByName',
                     data: { charname: event.target.dataset['userName'] }
@@ -170,7 +175,7 @@ var searchWidget = {
                     }
                     searchWidget.enableSearchForm();
 
-                });
+                });*/
             } else if (event.target && event.target.dataset) {
                 console.log(event.target.dataset);
             }
