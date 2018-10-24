@@ -135,7 +135,7 @@ var FFXI;
          */
         NasomiAuction.renderResults = function (status, results) {
             var nasomiInterface = new FFXI.NasomiInterface(),
-                searchResultsElement = document.getElementById('results');
+                searchResultsElement = document.getElementById('searchResults');
 
             nasomiInterface.clearAuctionResults(searchResultsElement);
             if (results.hasOwnProperty('sales')) {
@@ -143,6 +143,12 @@ var FFXI;
             }
             if (results.hasOwnProperty('sale_list')) {
                 nasomiInterface.renderAuctionResults(searchResultsElement, results['sale_list']);
+            }
+            if (results.hasOwnProperty('list')) {
+                nasomiInterface.renderAuctionResults(searchResultsElement, results['list']);
+            }
+            if (results.length > 0) {
+                nasomiInterface.renderAuctionResults(searchResultsElement, results);
             }
         };
         /**
@@ -185,15 +191,32 @@ var FFXI;
          * @constructor
          */
         NasomiInterface.prototype.renderAuctionItem = function (result, asHTML) {
-            var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
-            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
-            var auctionItemHTML = auctionItemSold.replace('{{item_meta}}', auctionItemMeta);
+            var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
+            var auctionItem = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5></div><ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul></div>';
+            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
+            var auctionItemHTML = '';
+
+            if (result.hasOwnProperty('buyer')) {
+                auctionItemHTML = auctionItemSold.replace('{{item_meta}}', auctionItemMeta);
+            } else {
+                auctionItemHTML = auctionItem + '';
+            }
 
             Object.keys(result).forEach(function (key, index) {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), result[key]);
             });
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stack_label}}', 'g'), (result.stack === '0' ? 'No' : 'Yes'));
-            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + result.itemid + '.png');
+
+            if (result.stack === '0') {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
+            } else {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), ' x' + result.stackSize);
+            }
+            if (result.stackSize !== '1') {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('nav-link fas fa-search-plus disabled', 'g'), 'nav-link fas fa-search-plus');
+            }
 
             return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
         };
@@ -204,7 +227,7 @@ var FFXI;
         };
 
         NasomiInterface.prototype.renderAuctionHeader = function (results, asHTML) {
-            var auctionHeader = '<div class="list-group-item list-group-item-action flex-column align-items-start mb-3"><div class="d-flex w-100 justify-content-between"><div><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5></div><div><small class="d-block">Stock: {{stock}}</small><small class="d-block">Sell Frequency: {{stock_frequency}}</small></div></div></div>';
+            var auctionHeader = '<div class="list-group-item list-group-item-action flex-column align-items-start mb-3"><div class="d-flex w-100 justify-content-between"><div><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5></div><div><small class="d-block">Stock: {{stock}}</small><small class="d-block">Sell Frequency: {{stock_frequency}}</small></div></div></div>';
             var auctionItemHTML = '' + auctionHeader;
             var auctionStockFrequency = 'Slow'; // Slow, Normal, Fast
 
@@ -226,7 +249,14 @@ var FFXI;
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock}}', 'g'), results['sales']['onStock']);
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock_frequency}}', 'g'), auctionStockFrequency);
 
-            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + results.sale_list[0].itemid + '.png');
+
+            if (results.sale_list[0].stack === '0') {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
+            } else {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), ' x' + results.sale_list[0].stackSize);
+            }
 
             return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
         };
@@ -247,9 +277,6 @@ var FFXI;
          */
         NasomiInterface.prototype.renderAuctionResults = function (elementObject, results) {
             if (!elementObject) { return; }
-            if (results.hasOwnProperty('sales')) {
-                elementObject.append( this.renderAuctionHeader(results, true));
-            }
             for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
                 elementObject.append( this.renderAuctionItem(results[resultIndex], true));
             }

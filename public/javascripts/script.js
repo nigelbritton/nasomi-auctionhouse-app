@@ -54,10 +54,11 @@ var searchWidget = {
 
         searchWidget.settings.searchForm.addEventListener('submit', function(event) {
             event.preventDefault();
-            searchWidget.disableSearchForm();
+            // searchWidget.disableSearchForm();
             searchWidget.settings.searchResults.innerHTML = '';
             searchWidget.settings.searchField.value.trim();
             searchWidget.settings.searchField.blur();
+            // searchWidget.enableSearchForm();
 
             if (searchWidget.settings.searchFieldType.classList.contains('active')) {
                 FFXI.NasomiAuction.search({charname:searchWidget.settings.searchField.value});
@@ -110,6 +111,9 @@ var searchWidget = {
 
         searchWidget.settings.searchResults.addEventListener('click', function(event) {
             event.preventDefault();
+
+            if (event.target.classList.contains('disabled')) { return false; }
+
             if (event.target && event.target.dataset.hasOwnProperty('userId') && event.target.dataset.hasOwnProperty('userName')) {
                 var userObject = {
                     userId: event.target.dataset['userId'],
