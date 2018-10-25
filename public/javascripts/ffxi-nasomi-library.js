@@ -106,7 +106,7 @@ var FFXI;
          * @param params
          * @param callback
          */
-        NasomiAuction.search = function (params) {
+        NasomiAuction.search = function (params, callback) {
             var options = {
                 method: 'post',
             };
@@ -126,7 +126,14 @@ var FFXI;
                 options.url = '/api/searchItem';
                 options.params = { itemid: Math.floor(params.itemid), stack: (params.stack || 0) };
             }
-            NasomiAuction.searchRequest(options, NasomiAuction.renderResults);
+            if (callback) {
+                NasomiAuction.searchRequest(options, function (status, results) {
+                    callback();
+                    NasomiAuction.renderResults(status, results);
+                });
+            } else {
+                NasomiAuction.searchRequest(options, NasomiAuction.renderResults);
+            }
         };
         /**
          *

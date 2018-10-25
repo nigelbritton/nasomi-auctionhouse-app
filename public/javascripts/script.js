@@ -54,14 +54,16 @@ var searchWidget = {
 
         searchWidget.settings.searchForm.addEventListener('submit', function(event) {
             event.preventDefault();
-            // searchWidget.disableSearchForm();
+            searchWidget.disableSearchForm();
             searchWidget.settings.searchResults.innerHTML = '';
             searchWidget.settings.searchField.value.trim();
             searchWidget.settings.searchField.blur();
             // searchWidget.enableSearchForm();
 
             if (searchWidget.settings.searchFieldType.classList.contains('active')) {
-                FFXI.NasomiAuction.search({charname:searchWidget.settings.searchField.value});
+                FFXI.NasomiAuction.search({charname:searchWidget.settings.searchField.value}, function () {
+                    searchWidget.enableSearchForm();
+                });
                 /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchCharByName',
@@ -80,7 +82,9 @@ var searchWidget = {
 
                 });*/
             } else {
-                FFXI.NasomiAuction.search({itemname:searchWidget.settings.searchField.value});
+                FFXI.NasomiAuction.search({itemname:searchWidget.settings.searchField.value}, function () {
+                    searchWidget.enableSearchForm();
+                });
                 /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchItemByName',
@@ -119,10 +123,12 @@ var searchWidget = {
                     userId: event.target.dataset['userId'],
                     userName: event.target.dataset['userName']
                 };
-                // searchWidget.disableSearchForm();
+                searchWidget.disableSearchForm();
                 searchWidget.updateCharacterCache(userObject);
                 searchWidget.settings.searchResults.innerHTML = '';
-                FFXI.NasomiAuction.search({charid:event.target.dataset['userId']});
+                FFXI.NasomiAuction.search({charid:event.target.dataset['userId']}, function () {
+                    searchWidget.enableSearchForm();
+                });
                 /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchChar',
@@ -140,10 +146,12 @@ var searchWidget = {
                     itemId: event.target.dataset['itemId'],
                     itemName: event.target.dataset['itemName']
                 };
-                // searchWidget.disableSearchForm();
+                searchWidget.disableSearchForm();
                 searchWidget.updateRecentItemCache(itemObject);
                 searchWidget.settings.searchResults.innerHTML = '';
-                FFXI.NasomiAuction.search({itemid:event.target.dataset['itemId'],stack:event.target.dataset['stack']});
+                FFXI.NasomiAuction.search({itemid:event.target.dataset['itemId'],stack:event.target.dataset['stack']}, function () {
+                    searchWidget.enableSearchForm();
+                });
                 /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchItem',
@@ -159,9 +167,11 @@ var searchWidget = {
 
                 });*/
             } else if (event.target && event.target.dataset.hasOwnProperty('userName')) {
-                // searchWidget.disableSearchForm();
+                searchWidget.disableSearchForm();
                 searchWidget.settings.searchResults.innerHTML = '';
-                FFXI.NasomiAuction.search({charname:event.target.dataset['userName']});
+                FFXI.NasomiAuction.search({charname:event.target.dataset['userName']}, function () {
+                    searchWidget.enableSearchForm();
+                });
                 /*searchWidget.fetchQuery({
                     method: 'post',
                     url: '/api/searchCharByName',
