@@ -338,7 +338,7 @@ var FFXI;
                 },
                 alliance: 0,
                 friends: [],
-                saved: [],
+                favourites: [],
             };
             this.debug = false;
         }
@@ -392,15 +392,15 @@ var FFXI;
             return {};
         };
         /**
-         * savedAdd
-         * @param saved
+         * favouriteAdd
+         * @param favourite
          * @returns {object}
          */
-        NasomiProfile.prototype.savedAdd = function (saved) {
+        NasomiProfile.prototype.favouriteAdd = function (favourite) {
             var _this = this;
             var found = false;
-            for(var i = 0; i < _this.profile.saved.length; i++) {
-                if (_this.profile.saved[i].id === saved.id) {
+            for(var i = 0; i < _this.profile.favourites.length; i++) {
+                if (_this.profile.favourites[i].id === favourite.id) {
                     found = true;
                     break;
                 }
@@ -411,16 +411,16 @@ var FFXI;
             return _this.profile;
         };
         /**
-         * savedRemove
-         * @param savedId
+         * favouriteRemove
+         * @param favouriteId
          * @returns {object}
          */
-        NasomiProfile.prototype.savedRemove = function (savedId) {
+        NasomiProfile.prototype.favouriteRemove = function (favouriteId) {
             var _this = this;
             var found = false;
-            for(var i = 0; i < _this.profile.saved.length; i++) {
-                if (_this.profile.saved[i].id == savedId) {
-                    _this.profile.saved.splice(i, 1);
+            for(var i = 0; i < _this.profile.favourites.length; i++) {
+                if (_this.profile.favourites[i].id === favouriteId) {
+                    _this.profile.favourites.splice(i, 1);
                     break;
                 }
             }
