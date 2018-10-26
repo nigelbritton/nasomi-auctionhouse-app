@@ -200,7 +200,7 @@ var FFXI;
         NasomiInterface.prototype.renderAuctionItem = function (result, asHTML) {
             var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
             var auctionItem = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5></div><ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul></div>';
-            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
+            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}" data-fav-item-name="{{item_name}}" data-fav-item-stack="{{stack}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
             var auctionItemHTML = '';
 
             if (result.hasOwnProperty('buyer')) {
@@ -346,10 +346,11 @@ var FFXI;
          * load
          * @returns {*|((reportName?: string) => void)|string}
          */
-        NasomiProfile.prototype.load = function () {
+        NasomiProfile.prototype.load = function (createNew) {
             var NasomiUtils = new FFXI.NasomiUtils();
             var profile = NasomiUtils.getLocalStorage('ffxi-nasomi-profile');
-            if (typeof (profile) === "object") { this.profile = profile; }
+            if (typeof (profile) === "object" && profile !== null) { this.profile = profile; }
+            if (profile === null && createNew === true) { profile = this.profile; }
             return (profile || this.profile);
         };
         /**
@@ -406,7 +407,7 @@ var FFXI;
                 }
             }
             if (found === false) {
-                _this.profile.saved.push(saved);
+                _this.profile.favourites.push(favourite);
             }
             return _this.profile;
         };
@@ -435,7 +436,7 @@ var FFXI;
             var _this = this;
             var found = false;
             for(var i = 0; i < _this.profile.friends.length; i++) {
-                if (_this.profile.friends[i].id == friend.id) {
+                if (_this.profile.friends[i].id === friend.id) {
                     found = true;
                     break;
                 }
@@ -454,7 +455,7 @@ var FFXI;
             var _this = this;
             var found = false;
             for(var i = 0; i < _this.profile.friends.length; i++) {
-                if (_this.profile.friends[i].id == friendId) {
+                if (_this.profile.friends[i].id === friendId) {
                     _this.profile.friends.splice(i, 1);
                     break;
                 }
@@ -464,5 +465,9 @@ var FFXI;
         return NasomiProfile;
     }());
     FFXI.NasomiProfile = NasomiProfile;
+
+    FFXI.currentProfile = new NasomiProfile();
+    FFXI.currentProfile.load(true);
+    FFXI.currentProfile.update();
 
 })(FFXI || (FFXI = {}));

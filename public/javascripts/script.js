@@ -190,6 +190,18 @@ var searchWidget = {
                     searchWidget.enableSearchForm();
 
                 });*/
+            } else if (event.target &&
+                event.target.dataset.hasOwnProperty('favItemId') &&
+                event.target.dataset.hasOwnProperty('favItemName') &&
+                event.target.dataset.hasOwnProperty('favItemStack')) {
+                if (FFXI.currentProfile !== null) {
+                    FFXI.currentProfile.favouriteAdd({
+                        id: event.target.dataset.hasOwnProperty('favItemId'),
+                        itemName: event.target.dataset.hasOwnProperty('favItemName'),
+                        stack: event.target.dataset.hasOwnProperty('favItemStack'),
+                    });
+                    FFXI.currentProfile.update();
+                }
             } else if (event.target && event.target.dataset) {
                 console.log(event.target.dataset);
             }
