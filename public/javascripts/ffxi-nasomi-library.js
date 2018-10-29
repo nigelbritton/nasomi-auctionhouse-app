@@ -44,15 +44,26 @@ var FFXI;
          * @param callback
          */
         NasomiUtils.fetchQuery = function (options, callback) {
+            var responseJSON = {};
             var xhr = new XMLHttpRequest();
             xhr.open(options.method, options.url);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    callback(xhr.status, xhr.responseText);
+                    try {
+                        responseJSON = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        responseJSON = {};
+                    }
+                    callback(xhr.status, responseJSON);
                 }
                 else if (xhr.status !== 200) {
-                    callback(xhr.status, xhr.responseText);
+                    try {
+                        responseJSON = JSON.parse(xhr.responseText);
+                    } catch (e) {
+                        responseJSON = {};
+                    }
+                    callback(xhr.status, responseJSON);
                 }
             };
             xhr.send(this.fetchParams(options.params));
@@ -95,29 +106,57 @@ var FFXI;
          * @param params
          * @param callback
          */
-        NasomiAuction.prototype.search = function (params, callback) {
+        NasomiAuction.search = function (params, callback) {
             var options = {
                 method: 'post',
             };
             if (params.hasOwnProperty('charname')) {
                 options.url = '/api/searchCharByName';
-                options.charname = params.charname.trim();
+                options.params = { charname: params.charname.trim() };
             }
             if (params.hasOwnProperty('charid')) {
                 options.url = '/api/searchChar';
-                options.charid = params.charid;
+                options.params = { charid: Math.floor(params.charid) };
             }
-            NasomiAuction.searchRequest(options, this.renderResults(status, response));
+            if (params.hasOwnProperty('itemname')) {
+                options.url = '/api/searchItemByName';
+                options.params = { itemname: params.itemname.trim() };
+            }
+            if (params.hasOwnProperty('itemid')) {
+                options.url = '/api/searchItem';
+                options.params = { itemid: Math.floor(params.itemid), stack: (params.stack || 0) };
+            }
+            if (callback) {
+                NasomiAuction.searchRequest(options, function (status, results) {
+                    callback();
+                    NasomiAuction.renderResults(status, results);
+                });
+            } else {
+                NasomiAuction.searchRequest(options, NasomiAuction.renderResults);
+            }
         };
         /**
          *
          * @param status
          * @param results
          */
-        NasomiAuction.prototype.renderResults = function (status, results) {
+        NasomiAuction.renderResults = function (status, results) {
             var nasomiInterface = new FFXI.NasomiInterface(),
-                searchResultsElement = document.getElementById('results');
-            nasomiInterface.renderAuctionResults(searchResultsElement, results);
+                searchResultsElement = document.getElementById('searchResults');
+
+            nasomiInterface.clearAuctionResults(searchResultsElement);
+            if (results.hasOwnProperty('sales')) {
+                nasomiInterface.renderAuctionResultsHeader(searchResultsElement, results);
+            }
+            if (results.hasOwnProperty('sale_list')) {
+                nasomiInterface.renderAuctionResults(searchResultsElement, results['sale_list']);
+            }
+            if (results.hasOwnProperty('list')) {
+                nasomiInterface.renderAuctionResults(searchResultsElement, results['list']);
+            }
+            if (results.length > 0) {
+                nasomiInterface.renderAuctionResults(searchResultsElement, results);
+            }
         };
         /**
          *
@@ -159,15 +198,82 @@ var FFXI;
          * @constructor
          */
         NasomiInterface.prototype.renderAuctionItem = function (result, asHTML) {
-            var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
-            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
-            var auctionItemHTML = auctionItemSold.replace('{{item_meta}}', auctionItemMeta);
+            var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
+            var auctionItem = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}</h5></div><ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul></div>';
+            var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}" data-fav-item-name="{{item_name}}" data-fav-item-stack="{{stack}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-item-id="{{itemid}}" data-stack="0"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-item-id="{{itemid}}" data-stack="1"></a></li></ul>';
+            var auctionItemHTML = '';
+
+            if (result.hasOwnProperty('buyer')) {
+                auctionItemHTML = auctionItemSold.replace('{{item_meta}}', auctionItemMeta);
+            } else {
+                auctionItemHTML = auctionItem + '';
+            }
 
             Object.keys(result).forEach(function (key, index) {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), result[key]);
             });
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stack_label}}', 'g'), (result.stack === '0' ? 'No' : 'Yes'));
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + result.itemid + '.png');
+
+            if (result.stack === '0') {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
+            } else {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), ' x' + result.stackSize);
+            }
+            if (result.stackSize !== '1') {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('nav-link fas fa-search-plus disabled', 'g'), 'nav-link fas fa-search-plus');
+            }
 
             return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
+        };
+
+        NasomiInterface.prototype.clearAuctionResults = function (elementObject) {
+            if (!elementObject) { return; }
+            elementObject.innerHTML = '';
+        };
+
+        NasomiInterface.prototype.renderAuctionHeader = function (results, asHTML) {
+            var auctionHeader = '<div class="list-group-item list-group-item-action flex-column align-items-start mb-3"><div class="d-flex w-100 justify-content-between"><div><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5></div><div><small class="d-block">Stock: {{stock}}</small><small class="d-block">Sell Frequency: {{stock_frequency}}</small></div></div></div>';
+            var auctionItemHTML = '' + auctionHeader;
+            var auctionStockFrequency = 'Slow'; // Slow, Normal, Fast
+
+            if (results['sales'] && results['sales']['sold15days']) {
+                if (Math.floor(results['sales']['sold15days']) > 500 &&
+                    Math.floor(results['sales']['sold15days']) <= 1000) {
+                    auctionStockFrequency = 'Normal';
+                } else if (Math.floor(results['sales']['sold15days']) > 1000) {
+                    auctionStockFrequency = 'Fast';
+                }
+            }
+
+            if (results.sale_list.length > 0) {
+                Object.keys(results.sale_list[0]).forEach(function (key, index) {
+                    auctionItemHTML = auctionItemHTML.replace(new RegExp('{{' + key + '}}', 'g'), results.sale_list[0][key]);
+                });
+            }
+
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock}}', 'g'), results['sales']['onStock']);
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock_frequency}}', 'g'), auctionStockFrequency);
+
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + results.sale_list[0].itemid + '.png');
+
+            if (results.sale_list[0].stack === '0') {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
+            } else {
+                auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), ' x' + results.sale_list[0].stackSize);
+            }
+
+            return (asHTML === true ? this.utils.createElementFromHTML(auctionItemHTML) : auctionItemHTML);
+        };
+
+        NasomiInterface.prototype.renderAuctionResultsHeader = function (elementObject, results) {
+
+            if (!elementObject) { return; }
+            if (results.hasOwnProperty('sales')) {
+                elementObject.append( this.renderAuctionHeader(results, true));
+            }
         };
 
         /**
@@ -178,7 +284,6 @@ var FFXI;
          */
         NasomiInterface.prototype.renderAuctionResults = function (elementObject, results) {
             if (!elementObject) { return; }
-            elementObject.innerHTML = '';
             for (var resultIndex = 0; resultIndex < results.length; resultIndex++) {
                 elementObject.append( this.renderAuctionItem(results[resultIndex], true));
             }
@@ -233,7 +338,7 @@ var FFXI;
                 },
                 alliance: 0,
                 friends: [],
-                saved: [],
+                favourites: [],
             };
             this.debug = false;
         }
@@ -241,10 +346,11 @@ var FFXI;
          * load
          * @returns {*|((reportName?: string) => void)|string}
          */
-        NasomiProfile.prototype.load = function () {
+        NasomiProfile.prototype.load = function (createNew) {
             var NasomiUtils = new FFXI.NasomiUtils();
             var profile = NasomiUtils.getLocalStorage('ffxi-nasomi-profile');
-            if (typeof (profile) === "object") { this.profile = profile; }
+            if (typeof (profile) === "object" && profile !== null) { this.profile = profile; }
+            if (profile === null && createNew === true) { profile = this.profile; }
             return (profile || this.profile);
         };
         /**
@@ -287,35 +393,35 @@ var FFXI;
             return {};
         };
         /**
-         * savedAdd
-         * @param saved
+         * favouriteAdd
+         * @param favourite
          * @returns {object}
          */
-        NasomiProfile.prototype.savedAdd = function (saved) {
+        NasomiProfile.prototype.favouriteAdd = function (favourite) {
             var _this = this;
             var found = false;
-            for(var i = 0; i < _this.profile.saved.length; i++) {
-                if (_this.profile.saved[i].id === saved.id) {
+            for(var i = 0; i < _this.profile.favourites.length; i++) {
+                if (_this.profile.favourites[i].id === favourite.id) {
                     found = true;
                     break;
                 }
             }
             if (found === false) {
-                _this.profile.saved.push(saved);
+                _this.profile.favourites.push(favourite);
             }
             return _this.profile;
         };
         /**
-         * savedRemove
-         * @param savedId
+         * favouriteRemove
+         * @param favouriteId
          * @returns {object}
          */
-        NasomiProfile.prototype.savedRemove = function (savedId) {
+        NasomiProfile.prototype.favouriteRemove = function (favouriteId) {
             var _this = this;
             var found = false;
-            for(var i = 0; i < _this.profile.saved.length; i++) {
-                if (_this.profile.saved[i].id == savedId) {
-                    _this.profile.saved.splice(i, 1);
+            for(var i = 0; i < _this.profile.favourites.length; i++) {
+                if (_this.profile.favourites[i].id === favouriteId) {
+                    _this.profile.favourites.splice(i, 1);
                     break;
                 }
             }
@@ -330,7 +436,7 @@ var FFXI;
             var _this = this;
             var found = false;
             for(var i = 0; i < _this.profile.friends.length; i++) {
-                if (_this.profile.friends[i].id == friend.id) {
+                if (_this.profile.friends[i].id === friend.id) {
                     found = true;
                     break;
                 }
@@ -349,7 +455,7 @@ var FFXI;
             var _this = this;
             var found = false;
             for(var i = 0; i < _this.profile.friends.length; i++) {
-                if (_this.profile.friends[i].id == friendId) {
+                if (_this.profile.friends[i].id === friendId) {
                     _this.profile.friends.splice(i, 1);
                     break;
                 }
@@ -359,5 +465,9 @@ var FFXI;
         return NasomiProfile;
     }());
     FFXI.NasomiProfile = NasomiProfile;
+
+    FFXI.currentProfile = new NasomiProfile();
+    FFXI.currentProfile.load(true);
+    FFXI.currentProfile.update();
 
 })(FFXI || (FFXI = {}));
