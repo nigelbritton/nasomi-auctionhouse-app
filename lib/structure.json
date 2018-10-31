@@ -1,0 +1,233 @@
+[{
+    "groupId": 0,
+    "title": "Weapons",
+    "groups": [
+        {
+            "id": 1,
+            "title": "Hand to Hand"
+        },{
+            "id": 2,
+            "title": "Daggers"
+        },{
+            "id": 3,
+            "title": "Swords"
+        },{
+            "id": 4,
+            "title": "Great Swords"
+        },{
+            "id": 5,
+            "title": "Axes"
+        },{
+            "id": 6,
+            "title": "Great Axes"
+        },{
+            "id": 7,
+            "title": "Scythe"
+        },{
+            "id": 8,
+            "title": "Polearms"
+        },{
+            "id": 9,
+            "title": "Katana"
+        },{
+            "id": 10,
+            "title": "Great Katana"
+        },{
+            "id": 11,
+            "title": "Clubs"
+        },{
+            "id": 12,
+            "title": "Staves"
+        },{
+            "id": 13,
+            "title": "Ranged"
+        },{
+            "id": 14,
+            "title": "Instruments"
+        },{
+            "groupId": 0,
+            "title": "Ammo and Misc",
+            "groups": [
+                {
+                    "id": 48,
+                    "title": "Pet Items"
+                },
+                {
+                    "id": 47,
+                    "title": "Fishing Gear"
+                },
+                {
+                    "id": 15,
+                    "title": "Ammunition"
+                },
+                {
+                    "id": 62,
+                    "title": "Grips"
+                }
+            ]
+        }
+    ]
+},{
+    "groupId": 0,
+    "title": "Armor",
+    "groups": [
+        {
+            "id": 16,
+            "title": "Shields"
+        },{
+            "id": 17,
+            "title": "Head"
+        },{
+            "id": 22,
+            "title": "Neck"
+        },{
+            "id": 18,
+            "title": "Body"
+        },{
+            "id": 19,
+            "title": "Hands"
+        },{
+            "id": 23,
+            "title": "Waist"
+        },{
+            "id": 20,
+            "title": "Legs"
+        },{
+            "id": 21,
+            "title": "Feet"
+        },{
+            "id": 26,
+            "title": "Back"
+        },{
+            "id": 24,
+            "title": "Earrings"
+        },{
+            "id": 25,
+            "title": "Rings"
+        }
+    ]
+},{
+    "groupId": 0,
+    "title": "Scrolls",
+    "groups": [{
+        "id": 28,
+        "title": "White Mage"
+    },{
+        "id": 29,
+        "title": "Black Mage"
+    },{
+        "id": 32,
+        "title": "Songs"
+    },{
+        "id": 31,
+        "title": "Ninjutsu"
+    },{
+        "id": 30,
+        "title": "Summoning"
+    },{
+        "id": 60,
+        "title": "Dice"
+    }]
+},{
+    "id": 33,
+    "title": "Medicines"
+},{
+    "id": 34,
+    "title": "Furnishings"
+},{
+    "groupId": 0,
+    "title": "Materials",
+    "groups": [
+        {
+            "id": 44,
+            "title": "Alchemy"
+        },{
+            "id": 63,
+            "title": "Alchemy 2"
+        },{
+            "id": 43,
+            "title": "Woodworking"
+        },{
+            "id": 42,
+            "title": "Bonecraft"
+        },{
+            "id": 41,
+            "title": "Leathercraft"
+        },{
+            "id": 40,
+            "title": "Clothcraft"
+        },{
+            "id": 39,
+            "title": "Goldsmithing"
+        },{
+            "id": 38,
+            "title": "Smithing"
+        }
+    ]
+},{
+    "groupId": 0,
+    "title": "Food",
+    "groups": [{
+        "groupId": 0,
+        "title": "Meals",
+        "groups": [{
+            "id": 52,
+            "title": "Meat and Eggs"
+        },{
+            "id": 53,
+            "title": "Seafood"
+        },{
+            "id": 54,
+            "title": "Vegetables"
+        },{
+            "id": 55,
+            "title": "Soups"
+        },{
+            "id": 56,
+            "title": "Bread and Rice"
+        },{
+            "id": 57,
+            "title": "Sweets"
+        },{
+            "id": 58,
+            "title": "Drinks"
+        }]
+    },{
+        "id": 59,
+        "title": "Ingredients"
+    },{
+        "id": 51,
+        "title": "Fish"
+    }]
+},{
+    "id": 35,
+    "title": "Crystals"
+},{
+    "groupId": 0,
+    "title": "Others",
+    "groups": [{
+        "id": 46,
+        "title": "Misc"
+    },{
+        "id": 64,
+        "title": "Misc 2"
+    },{
+        "id": 65,
+        "title": "Misc 2"
+    },{
+        "id": 50,
+        "title": "Beast-Made"
+    },{
+        "id": 36,
+        "title": "Cards"
+    },{
+        "id": 49,
+        "title": "Ninja Tools"
+    },{
+        "id": 37,
+        "title": "Cursed Items"
+    },{
+        "id": 61,
+        "title": "Automatons"
+    }]
+}]

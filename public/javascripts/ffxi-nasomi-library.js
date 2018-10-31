@@ -1,3 +1,10 @@
+/**
+ *
+ * 'bone_harness_+1'.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
+    return letter.toUpperCase(); } );
+ *
+ */
+
 var FFXI;
 (function (FFXI) {
 
