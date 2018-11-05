@@ -52,160 +52,166 @@ var searchWidget = {
             searchWidget.cachedData.recentItemSearches = searchWidget.getLocalStorage('recentItemSearches');
         }
 
-        searchWidget.settings.searchForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            searchWidget.disableSearchForm();
-            searchWidget.settings.searchResults.innerHTML = '';
-            searchWidget.settings.searchField.value.trim();
-            searchWidget.settings.searchField.blur();
-            // searchWidget.enableSearchForm();
-
-            if (searchWidget.settings.searchFieldType.classList.contains('active')) {
-                FFXI.NasomiAuction.search({charname:searchWidget.settings.searchField.value}, function () {
-                    searchWidget.enableSearchForm();
-                });
-                /*searchWidget.fetchQuery({
-                    method: 'post',
-                    url: '/api/searchCharByName',
-                    data: { charname: searchWidget.settings.searchField.value }
-                }, function (resultsData) {
-                    if (resultsData && resultsData.length > 0 && resultsData[0].itemid) {
-                        resultsData.forEach(function (resultData) {
-                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
-                        });
-                    } else {
-                        resultsData.forEach(function (result) {
-                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(result) );
-                        });
-                    }
-                    searchWidget.enableSearchForm();
-
-                });*/
-            } else {
-                FFXI.NasomiAuction.search({itemname:searchWidget.settings.searchField.value}, function () {
-                    searchWidget.enableSearchForm();
-                });
-                /*searchWidget.fetchQuery({
-                    method: 'post',
-                    url: '/api/searchItemByName',
-                    data: { itemname: searchWidget.settings.searchField.value }
-                }, function (resultsData) {
-
-                    resultsData.list.forEach(function (result) {
-                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultItemList(result) );
-                    });
-                    searchWidget.enableSearchForm();
-
-                });*/
-            }
-
-        }, false);
-
-        searchWidget.settings.searchFieldType.addEventListener('click', function(event) {
-            searchWidget.disableSearchForm();
-            if (searchWidget.settings.searchFieldType.classList.contains('active')) {
-                searchWidget.settings.searchFieldType.classList.remove('active');
-                searchWidget.settings.searchField.placeholder = "Item name; i.e. Moat Carp";
-            } else {
-                searchWidget.settings.searchFieldType.classList.add('active');
-                searchWidget.settings.searchField.placeholder = "Character name; i.e. Shirukusan";
-            }
-            searchWidget.enableSearchForm();
-        }, false);
-
-        searchWidget.settings.searchResults.addEventListener('click', function(event) {
-            event.preventDefault();
-
-            if (event.target.classList.contains('disabled')) { return false; }
-
-            if (event.target && event.target.dataset.hasOwnProperty('userId') && event.target.dataset.hasOwnProperty('userName')) {
-                var userObject = {
-                    userId: event.target.dataset['userId'],
-                    userName: event.target.dataset['userName']
-                };
-                searchWidget.disableSearchForm();
-                searchWidget.updateCharacterCache(userObject);
-                searchWidget.settings.searchResults.innerHTML = '';
-                FFXI.NasomiAuction.search({charid:event.target.dataset['userId']}, function () {
-                    searchWidget.enableSearchForm();
-                });
-                /*searchWidget.fetchQuery({
-                    method: 'post',
-                    url: '/api/searchChar',
-                    data: { charid: event.target.dataset['userId'] }
-                }, function (resultsData) {
-
-                    resultsData.forEach(function (resultData) {
-                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
-                    });
-                    searchWidget.enableSearchForm();
-
-                });*/
-            } else if (event.target && event.target.dataset.hasOwnProperty('itemId') && event.target.dataset.hasOwnProperty('stack')) {
-                var itemObject = {
-                    itemId: event.target.dataset['itemId'],
-                    itemName: event.target.dataset['itemName']
-                };
-                searchWidget.disableSearchForm();
-                searchWidget.updateRecentItemCache(itemObject);
-                searchWidget.settings.searchResults.innerHTML = '';
-                FFXI.NasomiAuction.search({itemid:event.target.dataset['itemId'],stack:event.target.dataset['stack']}, function () {
-                    searchWidget.enableSearchForm();
-                });
-                /*searchWidget.fetchQuery({
-                    method: 'post',
-                    url: '/api/searchItem',
-                    data: {
-                        itemid: event.target.dataset['itemId'],
-                        stack: event.target.dataset['stack']}
-                }, function (resultsData) {
-                    console.log(resultsData);
-                    resultsData.sale_list.forEach(function (resultData) {
-                        searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
-                    });
-                    searchWidget.enableSearchForm();
-
-                });*/
-            } else if (event.target && event.target.dataset.hasOwnProperty('userName')) {
+        if (searchWidget.settings.searchForm !== null) {
+            searchWidget.settings.searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
                 searchWidget.disableSearchForm();
                 searchWidget.settings.searchResults.innerHTML = '';
-                FFXI.NasomiAuction.search({charname:event.target.dataset['userName']}, function () {
-                    searchWidget.enableSearchForm();
-                });
-                /*searchWidget.fetchQuery({
-                    method: 'post',
-                    url: '/api/searchCharByName',
-                    data: { charname: event.target.dataset['userName'] }
-                }, function (resultsData) {
+                searchWidget.settings.searchField.value.trim();
+                searchWidget.settings.searchField.blur();
+                // searchWidget.enableSearchForm();
 
-                    if (resultsData.length > 0 && resultsData[0].itemid) {
-                        resultsData.forEach(function (resultData) {
-                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
-                        });
-                    } else {
-                        resultsData.forEach(function (resultData) {
-                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(resultData) );
-                        });
-                    }
-                    searchWidget.enableSearchForm();
-
-                });*/
-            } else if (event.target &&
-                event.target.dataset.hasOwnProperty('favItemId') &&
-                event.target.dataset.hasOwnProperty('favItemName') &&
-                event.target.dataset.hasOwnProperty('favItemStack')) {
-                if (FFXI.currentProfile !== null) {
-                    FFXI.currentProfile.favouriteAdd({
-                        id: event.target.dataset.hasOwnProperty('favItemId'),
-                        itemName: event.target.dataset.hasOwnProperty('favItemName'),
-                        stack: event.target.dataset.hasOwnProperty('favItemStack'),
+                if (searchWidget.settings.searchFieldType.classList.contains('active')) {
+                    FFXI.NasomiAuction.search({charname:searchWidget.settings.searchField.value}, function () {
+                        searchWidget.enableSearchForm();
                     });
-                    FFXI.currentProfile.update();
+                    /*searchWidget.fetchQuery({
+                        method: 'post',
+                        url: '/api/searchCharByName',
+                        data: { charname: searchWidget.settings.searchField.value }
+                    }, function (resultsData) {
+                        if (resultsData && resultsData.length > 0 && resultsData[0].itemid) {
+                            resultsData.forEach(function (resultData) {
+                                searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
+                            });
+                        } else {
+                            resultsData.forEach(function (result) {
+                                searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(result) );
+                            });
+                        }
+                        searchWidget.enableSearchForm();
+
+                    });*/
+                } else {
+                    FFXI.NasomiAuction.search({itemname:searchWidget.settings.searchField.value}, function () {
+                        searchWidget.enableSearchForm();
+                    });
+                    /*searchWidget.fetchQuery({
+                        method: 'post',
+                        url: '/api/searchItemByName',
+                        data: { itemname: searchWidget.settings.searchField.value }
+                    }, function (resultsData) {
+
+                        resultsData.list.forEach(function (result) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultItemList(result) );
+                        });
+                        searchWidget.enableSearchForm();
+
+                    });*/
                 }
-            } else if (event.target && event.target.dataset) {
-                console.log(event.target.dataset);
-            }
-        }, false);
+
+            }, false);
+        }
+
+        if (searchWidget.settings.searchFieldType !== null) {
+            searchWidget.settings.searchFieldType.addEventListener('click', function(event) {
+                searchWidget.disableSearchForm();
+                if (searchWidget.settings.searchFieldType.classList.contains('active')) {
+                    searchWidget.settings.searchFieldType.classList.remove('active');
+                    searchWidget.settings.searchField.placeholder = "Item name; i.e. Moat Carp";
+                } else {
+                    searchWidget.settings.searchFieldType.classList.add('active');
+                    searchWidget.settings.searchField.placeholder = "Character name; i.e. Shirukusan";
+                }
+                searchWidget.enableSearchForm();
+            }, false);
+        }
+
+        if (searchWidget.settings.searchFieldType !== null) {
+            searchWidget.settings.searchResults.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                if (event.target.classList.contains('disabled')) { return false; }
+
+                if (event.target && event.target.dataset.hasOwnProperty('userId') && event.target.dataset.hasOwnProperty('userName')) {
+                    var userObject = {
+                        userId: event.target.dataset['userId'],
+                        userName: event.target.dataset['userName']
+                    };
+                    searchWidget.disableSearchForm();
+                    searchWidget.updateCharacterCache(userObject);
+                    searchWidget.settings.searchResults.innerHTML = '';
+                    FFXI.NasomiAuction.search({charid:event.target.dataset['userId']}, function () {
+                        searchWidget.enableSearchForm();
+                    });
+                    /*searchWidget.fetchQuery({
+                        method: 'post',
+                        url: '/api/searchChar',
+                        data: { charid: event.target.dataset['userId'] }
+                    }, function (resultsData) {
+
+                        resultsData.forEach(function (resultData) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
+                        });
+                        searchWidget.enableSearchForm();
+
+                    });*/
+                } else if (event.target && event.target.dataset.hasOwnProperty('itemId') && event.target.dataset.hasOwnProperty('stack')) {
+                    var itemObject = {
+                        itemId: event.target.dataset['itemId'],
+                        itemName: event.target.dataset['itemName']
+                    };
+                    searchWidget.disableSearchForm();
+                    searchWidget.updateRecentItemCache(itemObject);
+                    searchWidget.settings.searchResults.innerHTML = '';
+                    FFXI.NasomiAuction.search({itemid:event.target.dataset['itemId'],stack:event.target.dataset['stack']}, function () {
+                        searchWidget.enableSearchForm();
+                    });
+                    /*searchWidget.fetchQuery({
+                        method: 'post',
+                        url: '/api/searchItem',
+                        data: {
+                            itemid: event.target.dataset['itemId'],
+                            stack: event.target.dataset['stack']}
+                    }, function (resultsData) {
+                        console.log(resultsData);
+                        resultsData.sale_list.forEach(function (resultData) {
+                            searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
+                        });
+                        searchWidget.enableSearchForm();
+
+                    });*/
+                } else if (event.target && event.target.dataset.hasOwnProperty('userName')) {
+                    searchWidget.disableSearchForm();
+                    searchWidget.settings.searchResults.innerHTML = '';
+                    FFXI.NasomiAuction.search({charname:event.target.dataset['userName']}, function () {
+                        searchWidget.enableSearchForm();
+                    });
+                    /*searchWidget.fetchQuery({
+                        method: 'post',
+                        url: '/api/searchCharByName',
+                        data: { charname: event.target.dataset['userName'] }
+                    }, function (resultsData) {
+
+                        if (resultsData.length > 0 && resultsData[0].itemid) {
+                            resultsData.forEach(function (resultData) {
+                                searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserAuctionListings(resultData) );
+                            });
+                        } else {
+                            resultsData.forEach(function (resultData) {
+                                searchWidget.settings.searchResults.appendChild( searchWidget.buildResultUserList(resultData) );
+                            });
+                        }
+                        searchWidget.enableSearchForm();
+
+                    });*/
+                } else if (event.target &&
+                    event.target.dataset.hasOwnProperty('favItemId') &&
+                    event.target.dataset.hasOwnProperty('favItemName') &&
+                    event.target.dataset.hasOwnProperty('favItemStack')) {
+                    if (FFXI.currentProfile !== null) {
+                        FFXI.currentProfile.favouriteAdd({
+                            id: event.target.dataset.hasOwnProperty('favItemId'),
+                            itemName: event.target.dataset.hasOwnProperty('favItemName'),
+                            stack: event.target.dataset.hasOwnProperty('favItemStack'),
+                        });
+                        FFXI.currentProfile.update();
+                    }
+                } else if (event.target && event.target.dataset) {
+                    console.log(event.target.dataset);
+                }
+            }, false);
+        }
     },
 
     /**

@@ -186,6 +186,17 @@ var FFXI;
             var _this = this;
             this.debug = false;
         }
+        NasomiAuctionConfig.getStructure = function (callback) {
+            NasomiUtils.fetchQuery({
+                method: 'get',
+                url: '/json/structure.json',
+            }, (callback ? callback : function (status, response) {
+                
+            }));
+        };
+        NasomiAuctionConfig.getStructureItems = function () {
+
+        };
         return NasomiAuctionConfig;
     }());
     FFXI.NasomiAuctionConfig = NasomiAuctionConfig;
