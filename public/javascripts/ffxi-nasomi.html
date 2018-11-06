@@ -12,5 +12,17 @@
 <div style="margin: auto; max-width: 640px;">
     <div id="searchResults"></div>
 </div>
+<script type="text/javascript">
+    FFXI.NasomiAuctionConfig.getStructure(function(status, results){
+        var nasomiInterface = new FFXI.NasomiInterface();
+        var searchResultsElement = document.getElementById('searchResults');
+        var categoryElements = nasomiInterface.renderAuctionCategories(results, true);
+        // console.log(categoryElements);
+        for (var categoryIndex = 0; categoryIndex < categoryElements.length; categoryIndex++) {
+            // searchResultsElement.append(categoryElements[categoryIndex]);
+            console.log(categoryElements[categoryIndex]);
+        }
+    });
+</script>
 </body>
 </html>

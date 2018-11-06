@@ -24,6 +24,16 @@ var FFXI;
             return div.firstChild;
         };
         /**
+         * createElementFromHTML
+         * @param htmlString
+         * @returns {Node | null}
+         */
+        NasomiUtils.prototype.createElementsFromHTML = function (htmlString) {
+            var div = document.createElement('div');
+            div.innerHTML = htmlString.trim();
+            return (div.children ? div.children : div.firstChild);
+        };
+        /**
          * getLocalStorage
          * @param objectId string
          */
@@ -207,6 +217,27 @@ var FFXI;
             this.debug = false;
             this.utils = new FFXI.NasomiUtils();
         }
+
+        NasomiInterface.prototype.renderAuctionCategories = function (results, asHTML) {
+            var auctionCategoryGroup = '<div class="list-group mb-3">{{category_items}}</div>';
+            var auctionCategoryHeading = '<div class="list-group-item list-group-item-success"><strong>{{title}}</strong></div>';
+            var auctionCategoryItem = '<a class="list-group-item list-group-item-warning">{{title}}</a>';
+            var auctionCategoryGroupHTML = '';
+            var auctionCategoryHTML = '';
+
+            results.forEach(function (resultGroup) {
+                auctionCategoryGroupHTML = '';
+                auctionCategoryHTML += auctionCategoryGroup;
+                if (resultGroup.hasOwnProperty('groupId')) {
+                    auctionCategoryGroupHTML += auctionCategoryHeading.replace('{{title}}', resultGroup.title);
+                } else if (resultGroup.hasOwnProperty('id')) {
+                    auctionCategoryGroupHTML += auctionCategoryItem.replace('{{title}}', resultGroup.title);
+                }
+                auctionCategoryHTML = auctionCategoryHTML.replace('{{category_items}}', auctionCategoryGroupHTML);
+            });
+
+            return (asHTML === true ? this.utils.createElementsFromHTML(auctionCategoryHTML) : auctionCategoryHTML);
+        };
 
         /**
          * RenderAuctionItem
