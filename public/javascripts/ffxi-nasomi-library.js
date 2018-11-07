@@ -218,25 +218,52 @@ var FFXI;
             this.utils = new FFXI.NasomiUtils();
         }
 
-        NasomiInterface.prototype.renderAuctionCategories = function (results, asHTML) {
-            var auctionCategoryGroup = '<div class="list-group mb-3">{{category_items}}</div>';
-            var auctionCategoryHeading = '<div class="list-group-item list-group-item-success"><strong>{{title}}</strong></div>';
-            var auctionCategoryItem = '<a class="list-group-item list-group-item-warning">{{title}}</a>';
-            var auctionCategoryGroupHTML = '';
-            var auctionCategoryHTML = '';
+        NasomiInterface.prototype.renderAuctionCategories = function (searchResultsElement) {
 
-            results.forEach(function (resultGroup) {
-                auctionCategoryGroupHTML = '';
-                auctionCategoryHTML += auctionCategoryGroup;
-                if (resultGroup.hasOwnProperty('groupId')) {
-                    auctionCategoryGroupHTML += auctionCategoryHeading.replace('{{title}}', resultGroup.title);
-                } else if (resultGroup.hasOwnProperty('id')) {
-                    auctionCategoryGroupHTML += auctionCategoryItem.replace('{{title}}', resultGroup.title);
-                }
-                auctionCategoryHTML = auctionCategoryHTML.replace('{{category_items}}', auctionCategoryGroupHTML);
+            if (searchResultsElement === null) { return false; }
+
+            FFXI.NasomiAuctionConfig.getStructure(function(status, results) {
+
+                results.forEach(function (result) {
+                    var categoryGroup = document.createElement('div');
+                    if (result.hasOwnProperty('id')) {
+                        categoryGroup.innerHTML = '<div class="list-group mb-3"><a href="#" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success"><strong>{{title}}</strong></a>{{category_items}}</div>'.replace('{{groupId}}', result.id);
+                    } else {
+                        categoryGroup.innerHTML = '<div class="list-group mb-3"><div class="list-group-item list-group-item-success"><strong>{{title}}</strong></div>{{category_items}}</div>';
+                    }
+                    categoryGroup.innerHTML = categoryGroup.innerHTML.replace('{{title}}', result.title);
+                    if (result.hasOwnProperty('groups')) {
+                        var categoryGroupHTML = '';
+                        result['groups'].forEach(function (resultGroup) {
+                            if (resultGroup.hasOwnProperty('id')) {
+                                categoryGroupHTML += '<a href="#" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">0</span></a>'.replace('{{title}}', resultGroup.title).replace('{{groupId}}', resultGroup.id);
+                            } else {
+                                categoryGroupHTML += '<div class="list-group-item list-group-item-success"><strong>{{title}}</strong></div>{{category_items}}'.replace('{{title}}', resultGroup.title);
+
+                                if (resultGroup.hasOwnProperty('groups')) {
+                                    var categorySubGroupHTML = '';
+                                    resultGroup['groups'].forEach(function (resultSubGroup) {
+                                        if (resultSubGroup.hasOwnProperty('id')) {
+                                            categorySubGroupHTML += '<a href="#" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center" style="padding-left: 40px;"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">0</span></a>'.replace('{{title}}', resultSubGroup.title).replace('{{groupId}}', resultSubGroup.id);
+                                        } else {
+                                            categorySubGroupHTML += '<div class="list-group-item list-group-item-warning"><strong>{{title}}</strong></div>'.replace('{{title}}', resultSubGroup.title);
+                                        }
+                                    });
+                                    categoryGroupHTML = categoryGroupHTML.replace('{{category_items}}', categorySubGroupHTML);
+                                } else {
+                                    categoryGroupHTML = categoryGroupHTML.replace('{{category_items}}', '');
+                                }
+
+                            }
+                        });
+                        categoryGroup.innerHTML = categoryGroup.innerHTML.replace('{{category_items}}', categoryGroupHTML);
+                    } else {
+                        categoryGroup.innerHTML = categoryGroup.innerHTML.replace('{{category_items}}', '');
+                    }
+                    searchResultsElement.appendChild(categoryGroup.firstChild);
+                });
+
             });
-
-            return (asHTML === true ? this.utils.createElementsFromHTML(auctionCategoryHTML) : auctionCategoryHTML);
         };
 
         /**
