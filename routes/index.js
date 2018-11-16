@@ -74,4 +74,32 @@ router.get('/browse', function(req, res, next) {
     res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
 });
 
+router.get('/browse/:groupId', function(req, res, next) {
+    var structureCategoriesHTML = '';
+    var structureItemsList = [];
+
+    if (req.params.groupId) {
+        structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', result.id);
+        structureItems.forEach(function(result) {
+            if (result.hasOwnProperty('aH') && Math.floor(result['aH']) === Math.floor(req.params.groupId)) {
+
+            }
+        });
+    }
+
+    res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
+});
+
+router.get('/search/', function(req, res, next) {
+    var structureCategoriesHTML = '';
+
+    res.render('browse', { title: 'Search', version: version, structureCategoriesHTML: structureCategoriesHTML });
+});
+
+router.get('/profile/', function(req, res, next) {
+    var structureCategoriesHTML = '';
+
+    res.render('browse', { title: 'Profile', version: version, structureCategoriesHTML: structureCategoriesHTML });
+});
+
 module.exports = router;

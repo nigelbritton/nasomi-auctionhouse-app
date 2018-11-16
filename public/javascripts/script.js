@@ -28,9 +28,18 @@ var searchWidget = {
         searchWidget.settings.sectionButtons = document.querySelectorAll('footer .navbar .nav-link');
         for (var buttonIndex = 0; buttonIndex < searchWidget.settings.sectionButtons.length; buttonIndex++) {
             searchWidget.settings.sectionButtons[buttonIndex].onclick = function(event) {
+                event.preventDefault();
                 try {
                     var sectionList = document.querySelectorAll('main section'),
                         targetSection = document.getElementById(this.dataset.id);
+
+                    if (this.dataset.id === 'homepage') { document.location = '/'; }
+                    if (this.dataset.id === 'list') { document.location = '/browse/'; }
+                    if (this.dataset.id === 'search') { document.location = '/search/'; }
+                    if (this.dataset.id === 'profile') { document.location = '/profile/'; }
+
+                    return false;
+
                     if (!targetSection.classList.contains('active')) {
                         for (var sectionIndex = 0; sectionIndex < sectionList.length; sectionIndex++) {
                             sectionList[sectionIndex].classList.remove('active');
