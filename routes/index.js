@@ -5,6 +5,27 @@ var version = require('../package.json').version;
 var structureCategories = require('../public/json/structure.json');
 var structureItems = require('../public/json/structure-items.json');
 
+var getCategoryById = function (results, id) {
+    var categoryObject = false;
+
+    for (var i = 0; i < results.length; i++) {
+        if (results[i].hasOwnProperty('id') &&
+            parseInt(results[i]['id']) === id) {
+            console.log('Found:', results[i], id);
+            categoryObject = results[i];
+            break;
+        } else if (results[i].hasOwnProperty('groups')) {
+            categoryObject = getCategoryById(results[i]['groups'], id);
+            if (categoryObject !== false) { return categoryObject; }
+        } else {
+            console.log('Skipped:', results[i], id);
+        }
+    }
+
+    // results.forEach(function (result) { });
+    return categoryObject;
+};
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'Home', version: version });
@@ -75,16 +96,44 @@ router.get('/browse', function(req, res, next) {
 });
 
 router.get('/browse/:groupId', function(req, res, next) {
-    var structureCategoriesHTML = '';
+    var structureCategoriesHTML = '',
+        categoryGroupHTML = '';
+    var structureCategory = {
+        id: parseInt(req.params.groupId),
+        title: ''
+    };
+    var structureCategoriesCounter = {};
     var structureItemsList = [];
 
-    if (req.params.groupId) {
-        structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', result.id);
-        structureItems.forEach(function(result) {
-            if (result.hasOwnProperty('aH') && Math.floor(result['aH']) === Math.floor(req.params.groupId)) {
+    structureItems.forEach(function(result){
+        if (result.hasOwnProperty('aH')) {
+            if (!structureCategoriesCounter[result['aH']]) {
+                structureCategoriesCounter[result['aH']] = 0;
+            }
+            structureCategoriesCounter[result['aH']]++;
+        }
+    });
 
+    structureCategory = getCategoryById(structureCategories, structureCategory.id);
+    console.log(structureCategory);
+
+    if (structureCategory.id > 0) {
+        structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', structureCategory.id);
+        if (structureCategoriesCounter[structureCategory.id]) {
+            structureCategoriesHTML = structureCategoriesHTML.replace('{{item_counter}}', structureCategoriesCounter[structureCategory.id]);
+        }
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{title}}', structureCategory.title);
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{groupId}}', structureCategory.id);
+
+        structureItems.forEach(function(result) {
+            if (result.hasOwnProperty('aH') && parseInt(result['aH']) === structureCategory.id) {
+                var localName = result.name.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
+                    return letter.toUpperCase(); } );
+                categoryGroupHTML += '<a class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{title}}', localName);
             }
         });
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{category_items}}', categoryGroupHTML);
+
     }
 
     res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
