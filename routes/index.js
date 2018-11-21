@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var debug = require('debug')('nasomi-auctionhouse-app:routing');
+var loadContent = require('../lib/loadContent')();
 
 var version = require('../package.json').version;
 var structureCategories = require('../public/json/structure.json');
@@ -11,20 +13,47 @@ var getCategoryById = function (results, id) {
     for (var i = 0; i < results.length; i++) {
         if (results[i].hasOwnProperty('id') &&
             parseInt(results[i]['id']) === id) {
-            console.log('Found:', results[i], id);
+            debug('Found:', results[i], id);
             categoryObject = results[i];
             break;
         } else if (results[i].hasOwnProperty('groups')) {
             categoryObject = getCategoryById(results[i]['groups'], id);
             if (categoryObject !== false) { return categoryObject; }
         } else {
-            console.log('Skipped:', results[i], id);
+            debug('Skipped:', results[i], id);
         }
     }
 
-    // results.forEach(function (result) { });
     return categoryObject;
 };
+
+var getItemById = function (results, id) {
+    var itemObject = false;
+
+    for (var i = 0; i < results.length; i++) {
+        if (results[i].hasOwnProperty('itemid') &&
+            parseInt(results[i]['itemid']) === id) {
+            // debug('Found:', results[i], id);
+            itemObject = results[i];
+            break;
+        } else {
+            // debug('Skipped:', results[i], id);
+        }
+    }
+
+    return itemObject;
+};
+
+var structureCategoriesCounter = {};
+
+structureItems.forEach(function(result){
+    if (result.hasOwnProperty('aH')) {
+        if (!structureCategoriesCounter[result['aH']]) {
+            structureCategoriesCounter[result['aH']] = 0;
+        }
+        structureCategoriesCounter[result['aH']]++;
+    }
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -33,16 +62,6 @@ router.get('/', function(req, res, next) {
 
 router.get('/browse', function(req, res, next) {
     var structureCategoriesHTML = '';
-    var structureCategoriesCounter = {};
-
-    structureItems.forEach(function(result){
-        if (result.hasOwnProperty('aH')) {
-            if (!structureCategoriesCounter[result['aH']]) {
-                structureCategoriesCounter[result['aH']] = 0;
-            }
-            structureCategoriesCounter[result['aH']]++;
-        }
-    });
 
     structureCategories.forEach(function (result) {
         if (result.hasOwnProperty('id')) {
@@ -102,20 +121,10 @@ router.get('/browse/:groupId', function(req, res, next) {
         id: parseInt(req.params.groupId),
         title: ''
     };
-    var structureCategoriesCounter = {};
     var structureItemsList = [];
 
-    structureItems.forEach(function(result){
-        if (result.hasOwnProperty('aH')) {
-            if (!structureCategoriesCounter[result['aH']]) {
-                structureCategoriesCounter[result['aH']] = 0;
-            }
-            structureCategoriesCounter[result['aH']]++;
-        }
-    });
-
     structureCategory = getCategoryById(structureCategories, structureCategory.id);
-    console.log(structureCategory);
+    debug(structureCategory);
 
     if (structureCategory.id > 0) {
         structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', structureCategory.id);
@@ -129,7 +138,7 @@ router.get('/browse/:groupId', function(req, res, next) {
             if (result.hasOwnProperty('aH') && parseInt(result['aH']) === structureCategory.id) {
                 var localName = result.name.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
                     return letter.toUpperCase(); } );
-                categoryGroupHTML += '<a class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{title}}', localName);
+                categoryGroupHTML += '<a href="/browse/item/{{id}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{id}}', result.itemid).replace('{{title}}', localName);
             }
         });
         structureCategoriesHTML = structureCategoriesHTML.replace('{{category_items}}', categoryGroupHTML);
@@ -137,6 +146,58 @@ router.get('/browse/:groupId', function(req, res, next) {
     }
 
     res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
+});
+
+router.get('/browse/item/:itemId', function(req, res, next) {
+    var structureCategoriesHTML = '',
+        categoryGroupHTML = '';
+    var structureCategory,
+        structureItem = {
+            itemid: parseInt(req.params.itemId),
+            name: ''
+        };
+
+    var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
+
+    structureItem = getItemById(structureItems, structureItem.itemid);
+
+    if (structureItem) {
+        structureCategory = getCategoryById(structureCategories, structureItem.aH);
+        structureItem.name = structureItem.name.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
+            return letter.toUpperCase(); } );
+
+        structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>';
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{groupId}}', structureCategory.id);
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{title}}', structureCategory.title);
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{item_counter}}', structureCategoriesCounter[structureItem.aH]);
+
+        categoryGroupHTML += '<a href="/browse/item/{{id}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{id}}', structureItem.itemid).replace('{{title}}', structureItem.name);
+
+        structureCategoriesHTML = structureCategoriesHTML.replace('{{category_items}}', categoryGroupHTML);
+
+        loadContent.searchItem( structureItem.itemid, 0 )
+            .then(function (response) {
+                debug(response);
+
+                if (response.hasOwnProperty('sale_list')) {
+                    structureCategoriesHTML += auctionItemSold;
+                }
+
+                res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
+
+            }).catch(function (error) {
+
+                debug(error);
+                res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: '' });
+
+            });
+
+    } else {
+
+        res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: '' });
+
+    }
+
 });
 
 router.get('/search/', function(req, res, next) {
