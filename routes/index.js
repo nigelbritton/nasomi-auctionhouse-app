@@ -65,7 +65,7 @@ router.get('/browse', function(req, res, next) {
 
     structureCategories.forEach(function (result) {
         if (result.hasOwnProperty('id')) {
-            structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', result.id);
+            structureCategoriesHTML += '<div class="list-group mb-3"><a data-href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', result.id);
             if (structureCategoriesCounter[result['id']]) {
                 structureCategoriesHTML = structureCategoriesHTML.replace('{{item_counter}}', structureCategoriesCounter[result['id']]);
             }
@@ -77,7 +77,7 @@ router.get('/browse', function(req, res, next) {
             var categoryGroupHTML = '';
             result['groups'].forEach(function (resultGroup) {
                 if (resultGroup.hasOwnProperty('id')) {
-                    categoryGroupHTML += '<a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>'.replace('{{title}}', resultGroup.title).replace('{{groupId}}', resultGroup.id);
+                    categoryGroupHTML += '<a data-href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>'.replace('{{title}}', resultGroup.title).replace('{{groupId}}', resultGroup.id);
                     if (structureCategoriesCounter[resultGroup['id']]) {
                         categoryGroupHTML = categoryGroupHTML.replace('{{item_counter}}', structureCategoriesCounter[resultGroup['id']]);
                     }
@@ -88,7 +88,7 @@ router.get('/browse', function(req, res, next) {
                         var categorySubGroupHTML = '';
                         resultGroup['groups'].forEach(function (resultSubGroup) {
                             if (resultSubGroup.hasOwnProperty('id')) {
-                                categorySubGroupHTML += '<a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center" style="padding-left: 40px;"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>'.replace('{{title}}', resultSubGroup.title).replace('{{groupId}}', resultSubGroup.id);
+                                categorySubGroupHTML += '<a data-href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center" style="padding-left: 40px;"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>'.replace('{{title}}', resultSubGroup.title).replace('{{groupId}}', resultSubGroup.id);
                                 if (structureCategoriesCounter[resultSubGroup.id]) {
                                     categorySubGroupHTML = categorySubGroupHTML.replace('{{item_counter}}', structureCategoriesCounter[resultSubGroup.id]);
                                 }
@@ -127,7 +127,7 @@ router.get('/browse/:groupId', function(req, res, next) {
     debug(structureCategory);
 
     if (structureCategory.id > 0) {
-        structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', structureCategory.id);
+        structureCategoriesHTML += '<div class="list-group mb-3"><a data-href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>'.replace('{{groupId}}', structureCategory.id);
         if (structureCategoriesCounter[structureCategory.id]) {
             structureCategoriesHTML = structureCategoriesHTML.replace('{{item_counter}}', structureCategoriesCounter[structureCategory.id]);
         }
@@ -138,7 +138,7 @@ router.get('/browse/:groupId', function(req, res, next) {
             if (result.hasOwnProperty('aH') && parseInt(result['aH']) === structureCategory.id) {
                 var localName = result.name.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
                     return letter.toUpperCase(); } );
-                categoryGroupHTML += '<a href="/browse/item/{{id}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{id}}', result.itemid).replace('{{title}}', localName);
+                categoryGroupHTML += '<a data-href="/browse/item/{{id}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{id}}', result.itemid).replace('{{title}}', localName);
             }
         });
         structureCategoriesHTML = structureCategoriesHTML.replace('{{category_items}}', categoryGroupHTML);
@@ -148,39 +148,75 @@ router.get('/browse/:groupId', function(req, res, next) {
     res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
 });
 
-router.get('/browse/item/:itemId', function(req, res, next) {
+router.get('/browse/item/:itemId/:stack?', function(req, res, next) {
     var structureCategoriesHTML = '',
         categoryGroupHTML = '';
-    var structureCategory,
-        structureItem = {
+    var auctionStockFrequency = 'Slow',
+        structureCategory,
+        structureItem,
+        structureItemSearch = {
             itemid: parseInt(req.params.itemId),
+            stack: (req.params.stack && req.params.stack === '1' ? 1 : 0),
             name: ''
         };
 
     var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
 
-    structureItem = getItemById(structureItems, structureItem.itemid);
+    var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}" data-fav-item-name="{{item_name}}" data-fav-item-stack="{{stack}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-href="/browse/item/{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-href="/browse/item/{{itemid}}/1"></a></li></ul>';
+
+    structureItem = getItemById(structureItems, structureItemSearch.itemid);
 
     if (structureItem) {
         structureCategory = getCategoryById(structureCategories, structureItem.aH);
         structureItem.name = structureItem.name.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
             return letter.toUpperCase(); } );
 
-        structureCategoriesHTML += '<div class="list-group mb-3"><a href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>';
+        structureCategoriesHTML += '<div class="list-group mb-3"><a data-href="/browse/{{groupId}}" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{item_counter}}</span></a>{{category_items}}</div>';
         structureCategoriesHTML = structureCategoriesHTML.replace('{{groupId}}', structureCategory.id);
         structureCategoriesHTML = structureCategoriesHTML.replace('{{title}}', structureCategory.title);
         structureCategoriesHTML = structureCategoriesHTML.replace('{{item_counter}}', structureCategoriesCounter[structureItem.aH]);
 
-        categoryGroupHTML += '<a href="/browse/item/{{id}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong></a>'.replace('{{id}}', structureItem.itemid).replace('{{title}}', structureItem.name);
+        categoryGroupHTML += '<div class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">{{sale_speed}}</span></div>'.replace('{{title}}', structureItem.name);
 
         structureCategoriesHTML = structureCategoriesHTML.replace('{{category_items}}', categoryGroupHTML);
 
-        loadContent.searchItem( structureItem.itemid, 0 )
+        loadContent.searchItem( structureItemSearch.itemid, structureItemSearch.stack )
             .then(function (response) {
-                debug(response);
+
+                if (response['sales'] && response['sales']['sold15days']) {
+                    if (Math.floor(response['sales']['sold15days']) > 500 &&
+                        Math.floor(response['sales']['sold15days']) <= 1000) {
+                        auctionStockFrequency = 'Normal';
+                    } else if (Math.floor(response['sales']['sold15days']) > 1000) {
+                        auctionStockFrequency = 'Fast';
+                    }
+                }
+                structureCategoriesHTML = structureCategoriesHTML.replace('{{sale_speed}}', auctionStockFrequency);
+
+                categoryGroupHTML = '';
 
                 if (response.hasOwnProperty('sale_list')) {
-                    structureCategoriesHTML += auctionItemSold;
+                    response.sale_list.forEach(function (auctionItem) {
+                        categoryGroupHTML += auctionItemSold;
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_meta}}', 'g'), auctionItemMeta);
+
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_icon_url}}', 'g'), '/icons/' + auctionItem.itemid +'.png');
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{itemid}}', 'g'), auctionItem.itemid);
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_name}}', 'g'), auctionItem.item_name);
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_multiplier}}', 'g'), (auctionItem.stack === '1' ? ' x' + auctionItem.stackSize : ''));
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{sell_date}}', 'g'), auctionItem.sell_date);
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{name}}', 'g'), auctionItem.name);
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{buyer}}', 'g'), auctionItem.buyer);
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{price}}', 'g'), auctionItem.price);
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{stack_label}}', 'g'), (auctionItem.stack === '0' ? 'No' : 'Yes'));
+
+                        if (auctionItem.stackSize === '12' ||
+                            auctionItem.stackSize === '99') {
+                            categoryGroupHTML = categoryGroupHTML.replace('fa-search-plus disabled', 'fa-search-plus');
+                        }
+
+                    });
+                    structureCategoriesHTML += categoryGroupHTML;
                 }
 
                 res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });

@@ -216,6 +216,14 @@ var FFXI;
             var _this = this;
             this.debug = false;
             this.utils = new FFXI.NasomiUtils();
+
+            this.navigationButtons = document.querySelectorAll('a[data-href]');
+            for (var buttonIndex = 0; buttonIndex < this.navigationButtons.length; buttonIndex++) {
+                this.navigationButtons[buttonIndex].onclick = function(event) {
+                    event.preventDefault();
+                    document.location = this.dataset.href;
+                }
+            }
         }
 
         NasomiInterface.prototype.renderAuctionCategories = function (searchResultsElement) {
@@ -541,9 +549,5 @@ var FFXI;
         return NasomiProfile;
     }());
     FFXI.NasomiProfile = NasomiProfile;
-
-    FFXI.currentProfile = new NasomiProfile();
-    FFXI.currentProfile.load(true);
-    FFXI.currentProfile.update();
 
 })(FFXI || (FFXI = {}));

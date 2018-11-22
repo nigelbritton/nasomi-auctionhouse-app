@@ -410,7 +410,14 @@ window.addEventListener('load', function(event) {
 
 }, false);
 
-var FFXIProfile;
+window.addEventListener('load', function(event) {
+    FFXI.currentProfile = new FFXI.NasomiProfile();
+    FFXI.currentProfile.load(true);
+    FFXI.currentProfile.update();
+    FFXI.userInterface = new FFXI.NasomiInterface();
+}, false);
+
+/*var FFXIProfile;
 (function (FFXIProfile, FFXI) {
     if (!FFXI) { return false; }
 
@@ -418,4 +425,4 @@ var FFXIProfile;
 
 
 
-})(FFXIProfile || {}, FFXI);
+})(FFXIProfile || {}, FFXI);*/
