@@ -321,7 +321,7 @@ var searchWidget = {
     buildResultItemList: function (resultData) {
         return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
             '<div class="d-flex w-100 justify-content-between">' +
-            '<h5 class="mb-1"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
+            '<h5 class="mb-1"><img class="float-left mr-1" src="/icons/' + resultData.itemid + '.png" />' + resultData.item_name + '</h5>' +
             // (resultData.stackSize === '1' ? '' : '<small data-item-id="' + resultData.itemid + '" data-stack="1" data-item-name="' + resultData.item_name + '">Stack</small>') +
             '</div>' +
             // '<p class="mb-1">' + resultData.item_desc + '</p>' +
@@ -339,7 +339,7 @@ var searchWidget = {
     buildResultUserAuctionListings: function (resultData) {
         return searchWidget.createElementFromHTML('<div class="list-group-item list-group-item-action flex-column align-items-start">' +
             '<div class="d-flex w-100 justify-content-between">' +
-            '<h5 class="mb-1"><img class="float-left mr-1" src="https://na.nasomi.com/auctionhouse/img/icons/icon/' + resultData.itemid + '.png" />' + 
+            '<h5 class="mb-1"><img class="float-left mr-1" src="/icons/' + resultData.itemid + '.png" />' +
             resultData.item_name + 
             (resultData.stack === '0' ? '' : ' x' + resultData.stackSize) +
             '</h5>' +
@@ -400,9 +400,10 @@ window.addEventListener('load', function(event) {
     window.applicationCache.addEventListener('updateready', function (e) {
         if (window.applicationCache.status === window.applicationCache.UPDATEREADY) {
             window.applicationCache.swapCache();
-            if (confirm('New version of this site is available. Load it?')) {
-                window.location.reload();
-            }
+            window.location.reload();
+            /*if (confirm('New version of this site is available. Load it?')) {
+
+            }*/
         } else {
 
         }

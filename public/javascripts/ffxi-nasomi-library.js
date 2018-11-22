@@ -298,7 +298,8 @@ var FFXI;
             });
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stack_label}}', 'g'), (result.stack === '0' ? 'No' : 'Yes'));
             // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
-            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + result.itemid + '.png');
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + result.itemid + '.png');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), '/icons/' + result.itemid + '.png');
 
             if (result.stack === '0') {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
@@ -341,7 +342,8 @@ var FFXI;
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock_frequency}}', 'g'), auctionStockFrequency);
 
             // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
-            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + results.sale_list[0].itemid + '.png');
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + results.sale_list[0].itemid + '.png');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), '/icons/' + results.sale_list[0].itemid + '.png');
 
             if (results.sale_list[0].stack === '0') {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');

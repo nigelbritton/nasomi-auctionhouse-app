@@ -237,15 +237,11 @@ router.get('/browse/item/:itemId/:stack?', function(req, res, next) {
 });
 
 router.get('/search/', function(req, res, next) {
-    var structureCategoriesHTML = '';
-
-    res.render('browse', { title: 'Search', version: version, structureCategoriesHTML: structureCategoriesHTML });
+    res.render('search', { title: 'Search', version: version });
 });
 
 router.get('/profile/', function(req, res, next) {
-    var structureCategoriesHTML = '';
-
-    res.render('browse', { title: 'Profile', version: version, structureCategoriesHTML: structureCategoriesHTML });
+    res.render('profile', { title: 'Profile', version: version });
 });
 
 module.exports = router;
