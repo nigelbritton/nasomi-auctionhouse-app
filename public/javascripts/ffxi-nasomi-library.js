@@ -1,3 +1,10 @@
+/**
+ *
+ * 'bone_harness_+1'.replace(new RegExp('_', 'g'), ' ').toLowerCase().replace(/\b[a-z](?=[a-z]{2})/g, function(letter) {
+    return letter.toUpperCase(); } );
+ *
+ */
+
 var FFXI;
 (function (FFXI) {
 
@@ -15,6 +22,16 @@ var FFXI;
             var div = document.createElement('div');
             div.innerHTML = htmlString.trim();
             return div.firstChild;
+        };
+        /**
+         * createElementFromHTML
+         * @param htmlString
+         * @returns {Node | null}
+         */
+        NasomiUtils.prototype.createElementsFromHTML = function (htmlString) {
+            var div = document.createElement('div');
+            div.innerHTML = htmlString.trim();
+            return (div.children ? div.children : div.firstChild);
         };
         /**
          * getLocalStorage
@@ -179,6 +196,17 @@ var FFXI;
             var _this = this;
             this.debug = false;
         }
+        NasomiAuctionConfig.getStructure = function (callback) {
+            NasomiUtils.fetchQuery({
+                method: 'get',
+                url: '/json/structure.json',
+            }, (callback ? callback : function (status, response) {
+                
+            }));
+        };
+        NasomiAuctionConfig.getStructureItems = function () {
+
+        };
         return NasomiAuctionConfig;
     }());
     FFXI.NasomiAuctionConfig = NasomiAuctionConfig;
@@ -188,7 +216,63 @@ var FFXI;
             var _this = this;
             this.debug = false;
             this.utils = new FFXI.NasomiUtils();
+
+            this.navigationButtons = document.querySelectorAll('a[data-href]');
+            for (var buttonIndex = 0; buttonIndex < this.navigationButtons.length; buttonIndex++) {
+                this.navigationButtons[buttonIndex].onclick = function(event) {
+                    event.preventDefault();
+                    document.location = this.dataset.href;
+                }
+            }
         }
+
+        NasomiInterface.prototype.renderAuctionCategories = function (searchResultsElement) {
+
+            if (searchResultsElement === null) { return false; }
+
+            FFXI.NasomiAuctionConfig.getStructure(function(status, results) {
+
+                results.forEach(function (result) {
+                    var categoryGroup = document.createElement('div');
+                    if (result.hasOwnProperty('id')) {
+                        categoryGroup.innerHTML = '<div class="list-group mb-3"><a href="#" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-success"><strong>{{title}}</strong></a>{{category_items}}</div>'.replace('{{groupId}}', result.id);
+                    } else {
+                        categoryGroup.innerHTML = '<div class="list-group mb-3"><div class="list-group-item list-group-item-success"><strong>{{title}}</strong></div>{{category_items}}</div>';
+                    }
+                    categoryGroup.innerHTML = categoryGroup.innerHTML.replace('{{title}}', result.title);
+                    if (result.hasOwnProperty('groups')) {
+                        var categoryGroupHTML = '';
+                        result['groups'].forEach(function (resultGroup) {
+                            if (resultGroup.hasOwnProperty('id')) {
+                                categoryGroupHTML += '<a href="#" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">0</span></a>'.replace('{{title}}', resultGroup.title).replace('{{groupId}}', resultGroup.id);
+                            } else {
+                                categoryGroupHTML += '<div class="list-group-item list-group-item-success"><strong>{{title}}</strong></div>{{category_items}}'.replace('{{title}}', resultGroup.title);
+
+                                if (resultGroup.hasOwnProperty('groups')) {
+                                    var categorySubGroupHTML = '';
+                                    resultGroup['groups'].forEach(function (resultSubGroup) {
+                                        if (resultSubGroup.hasOwnProperty('id')) {
+                                            categorySubGroupHTML += '<a href="#" data-group-id="{{groupId}}" class="list-group-item list-group-item-action list-group-item-warning d-flex justify-content-between align-items-center" style="padding-left: 40px;"><strong>{{title}}</strong><span class="badge badge-dark badge-pill">0</span></a>'.replace('{{title}}', resultSubGroup.title).replace('{{groupId}}', resultSubGroup.id);
+                                        } else {
+                                            categorySubGroupHTML += '<div class="list-group-item list-group-item-warning"><strong>{{title}}</strong></div>'.replace('{{title}}', resultSubGroup.title);
+                                        }
+                                    });
+                                    categoryGroupHTML = categoryGroupHTML.replace('{{category_items}}', categorySubGroupHTML);
+                                } else {
+                                    categoryGroupHTML = categoryGroupHTML.replace('{{category_items}}', '');
+                                }
+
+                            }
+                        });
+                        categoryGroup.innerHTML = categoryGroup.innerHTML.replace('{{category_items}}', categoryGroupHTML);
+                    } else {
+                        categoryGroup.innerHTML = categoryGroup.innerHTML.replace('{{category_items}}', '');
+                    }
+                    searchResultsElement.appendChild(categoryGroup.firstChild);
+                });
+
+            });
+        };
 
         /**
          * RenderAuctionItem
@@ -214,7 +298,8 @@ var FFXI;
             });
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stack_label}}', 'g'), (result.stack === '0' ? 'No' : 'Yes'));
             // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
-            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + result.itemid + '.png');
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + result.itemid + '.png');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), '/icons/' + result.itemid + '.png');
 
             if (result.stack === '0') {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
@@ -257,7 +342,8 @@ var FFXI;
             auctionItemHTML = auctionItemHTML.replace(new RegExp('{{stock_frequency}}', 'g'), auctionStockFrequency);
 
             // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://via.placeholder.com/32x32');
-            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + results.sale_list[0].itemid + '.png');
+            // auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), 'https://na.nasomi.com/auctionhouse/img/icons/icon/' + results.sale_list[0].itemid + '.png');
+            auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_icon_url}}', 'g'), '/icons/' + results.sale_list[0].itemid + '.png');
 
             if (results.sale_list[0].stack === '0') {
                 auctionItemHTML = auctionItemHTML.replace(new RegExp('{{item_multiplier}}', 'g'), '');
@@ -465,9 +551,5 @@ var FFXI;
         return NasomiProfile;
     }());
     FFXI.NasomiProfile = NasomiProfile;
-
-    FFXI.currentProfile = new NasomiProfile();
-    FFXI.currentProfile.load(true);
-    FFXI.currentProfile.update();
 
 })(FFXI || (FFXI = {}));

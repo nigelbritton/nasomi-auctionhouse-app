@@ -1,11 +1,15 @@
 CACHE MANIFEST
-# 2018-10-18:v24
+# 2018-11-15:v2
 
 CACHE:
 https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css
 https://use.fontawesome.com/releases/v5.2.0/css/all.css
 https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js
 
+/
+/browse
+/search
+/profile
 /stylesheets/style.css
 /javascripts/ffxi-nasomi-library.js
 /javascripts/script.js

@@ -1,15 +1,16 @@
-<main>
-    {{> homepage }}
-    {{> search }}
-    {{> profile }}
-</main>
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mt-3 mb-3"><img class="img-fluid" src="/images/nasomi-auctionhouse-bg.png" /></div>
+            <div class="col-12">
+                <h2 class="card-title">About</h2>
+                <p class="card-text">This is a simple mobile friendly web app which searches the Nasomi auction house.</p>
+            </div>
+            <div class="col-12">
+                <small>Version: {{{version}}}</small>
+            </div>
+        </div>
+    </div>
+</section>
 
-<footer>
-    <nav class="navbar fixed-bottom navbar-dark bg-dark">
-        <ul class="nav justify-content-center m-auto">
-            <li class="nav-item"><a class="nav-link fas fa-home active" href="#" data-id="homepage"></a></li>
-            <li class="nav-item"><a class="nav-link fas fa-search" href="#" data-id="search"></a></li>
-            <li class="nav-item"><a class="nav-link fas fa-user-cog" href="#" data-id="profile"></a></li>
-        </ul>
-    </nav>
-</footer>
+{{> footer }}

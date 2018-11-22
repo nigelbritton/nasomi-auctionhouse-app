@@ -1,0 +1,6 @@
+{
+  "name": "Nasomi Auctionhouse - Node.js Web Application",
+  "description": "This is a simple mobile friendly web app which searches the Nasomi auction house.",
+  "repository": "https://github.com/nigelbritton/nasomi-auctionhouse-app",
+  "keywords": ["node", "express", "handlebars"]
+}
