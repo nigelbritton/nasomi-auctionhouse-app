@@ -162,7 +162,7 @@ router.get('/browse/item/:itemId/:stack?', function(req, res, next) {
 
     var auctionItemSold = '<div class="list-group-item list-group-item-action flex-column align-items-start"><div class="d-flex w-100 justify-content-between"><h5 class="mb-1"><img class="float-left mr-1" src="{{item_icon_url}}" />{{item_name}}{{item_multiplier}}</h5><small>{{sell_date}}</small></div><div class="d-flex w-100 justify-content-between"><div><small class="d-block" data-user-name="{{name}}">Seller: {{name}}</small><small class="d-block" data-user-name="{{buyer}}">Buyer: {{buyer}}</small></div><div><small class="d-block">Price: {{price}} Gil</small><small class="d-block">Stack: {{stack_label}}</small></div></div>{{item_meta}}</div>';
 
-    var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}" data-fav-item-name="{{item_name}}" data-fav-item-stack="{{stack}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-href="/browse/item/{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-href="/browse/item/{{itemid}}/1"></a></li></ul>';
+    var auctionItemMeta = '<ul class="nav nav-options justify-content-center"><li class="nav-item"><a class="nav-link fas fa-user" data-user-name="{{name}}" data-href="/browse/user/{{id}}"></a></li><li class="nav-item"><a class="nav-link fas fa-heart" data-fav-item-id="{{itemid}}" data-fav-item-name="{{item_name}}" data-fav-item-stack="{{stack}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search" data-href="/browse/item/{{itemid}}"></a></li><li class="nav-item"><a class="nav-link fas fa-search-plus disabled" data-href="/browse/item/{{itemid}}/1"></a></li></ul>';
 
     structureItem = getItemById(structureItems, structureItemSearch.itemid);
 
@@ -183,6 +183,8 @@ router.get('/browse/item/:itemId/:stack?', function(req, res, next) {
         loadContent.searchItem( structureItemSearch.itemid, structureItemSearch.stack )
             .then(function (response) {
 
+                debug(response);
+
                 if (response['sales'] && response['sales']['sold15days']) {
                     if (Math.floor(response['sales']['sold15days']) > 500 &&
                         Math.floor(response['sales']['sold15days']) <= 1000) {
@@ -201,6 +203,7 @@ router.get('/browse/item/:itemId/:stack?', function(req, res, next) {
                         categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_meta}}', 'g'), auctionItemMeta);
 
                         categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_icon_url}}', 'g'), '/icons/' + auctionItem.itemid +'.png');
+                        categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{id}}', 'g'), auctionItem.id);
                         categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{itemid}}', 'g'), auctionItem.itemid);
                         categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_name}}', 'g'), auctionItem.item_name);
                         categoryGroupHTML = categoryGroupHTML.replace(new RegExp('{{item_multiplier}}', 'g'), (auctionItem.stack === '1' ? ' x' + auctionItem.stackSize : ''));
@@ -234,6 +237,27 @@ router.get('/browse/item/:itemId/:stack?', function(req, res, next) {
 
     }
 
+});
+
+router.get('/browse/user/:userId', function(req, res, next) {
+    var structureCategoriesHTML = '',
+        categoryGroupHTML = '';
+    var structureUser = {
+        id: parseInt(req.params.userId),
+        title: ''
+    };
+
+    loadContent.searchChar(structureUser.id)
+        .then(function (response) {
+
+            debug(response);
+
+        }).catch(function (error) {
+            debug(error);
+            res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: '' });
+        });
+
+    res.render('browse', { title: 'Browse', version: version, structureCategoriesHTML: structureCategoriesHTML });
 });
 
 router.get('/search/', function(req, res, next) {
